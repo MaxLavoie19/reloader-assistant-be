@@ -1,5 +1,3 @@
-from secrets import token_urlsafe
-
 from session.error.UserExists import UserExists
 from session.model.UserModel import UserModel
 from session.service.CredentialSerializerService.ICredentialSerializerService import ICredentialSerializerService
@@ -8,7 +6,9 @@ from session.service.CryptographicHashService.ICryptographicHashService import I
 
 class CredentialRepository:
     def __init__(
-        self, credentials_serializer_service: ICredentialSerializerService, cryptographic_hash_service: ICryptographicHashService
+        self,
+        credentials_serializer_service: ICredentialSerializerService,
+        cryptographic_hash_service: ICryptographicHashService
     ):
         self.credentials_serializer_service = credentials_serializer_service
         self.cryptographic_hash_service = cryptographic_hash_service

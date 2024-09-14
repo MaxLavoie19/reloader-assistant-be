@@ -1,0 +1,1 @@
+flask --app recipe_book run
