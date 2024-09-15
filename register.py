@@ -1,14 +1,14 @@
-from server_io.service.JsonFileService import JsonFileService
+from server_io.service.FileService import FileService
 from session.repository.CredentialRepository import CredentialRepository
-from session.service.CredentialSerializerService.JsonFileCredentialSerializerService import \
-    JsonFileCredentialSerializerService
+from server_io.service.SerializerService.JsonSerializerService import \
+    JsonSerializerService
 from session.service.CryptographicHashService.BlowfishHashService import BlowfishHashService
 
-json_file_service = JsonFileService()
-json_file_credential_serializer_service = JsonFileCredentialSerializerService(json_file_service)
+json_file_service = FileService()
+serializer_service = JsonSerializerService(json_file_service)
 blowfish_hash_service = BlowfishHashService()
 credential_repository = CredentialRepository(
-    credentials_serializer_service=json_file_credential_serializer_service,
+    serializer_service=serializer_service,
     cryptographic_hash_service=blowfish_hash_service
 )
 

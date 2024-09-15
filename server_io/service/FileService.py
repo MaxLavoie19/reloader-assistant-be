@@ -1,10 +1,10 @@
 import json
-from typing import Dict, Union
+from typing import Dict, Union, List
 
 
-class JsonFileService:
+class FileService:
     @staticmethod
-    def load(file_path: str) -> Union[Dict[str, str], None]:
+    def load(file_path: str) -> Union[List[Dict], Dict, None]:
         try:
             with open(file_path) as file:
                 data = json.load(file)
@@ -13,6 +13,6 @@ class JsonFileService:
         return data
 
     @staticmethod
-    def save(file_path: str, data: Dict[str, str]):
+    def save(file_path: str, data: Union[List[Dict], Dict]):
         with open(file_path, 'w') as file:
             json.dump(data, file)
