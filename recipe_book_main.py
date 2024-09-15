@@ -1,5 +1,9 @@
-from flask import Flask, request
+import json
+import sys
 
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+from werkzeug.datastructures.headers import Headers
 
 from server_io.service.JsonFileService import JsonFileService
 from session.repository.CredentialRepository import CredentialRepository
@@ -12,6 +16,7 @@ POST = 'POST'
 GET = 'GET'
 
 app = Flask('__name__')
+CORS(app)
 
 json_file_service = JsonFileService()
 json_file_credential_serializer_service = JsonFileCredentialSerializerService(json_file_service)
@@ -25,28 +30,44 @@ session_repository = SessionRepository(credential_repository)
 
 @app.route("/login", methods=[POST])
 def login():
-    print('request.values', request.values)
-    print('request.args', request.args)
-    print('request.data', request.data)
-    print('request.authorization', request.authorization)
+    data = json.loads(request.data)
+    username = data.get('username', '')
+    password = data.get('password', '')
+    token = session_repository.authenticate(username, password)
+    if token is None:
+        return 'Invalid username and password combination', 400
+    return jsonify(token=token)
 
 
 @app.route("/logout", methods=[POST])
 def logout():
-    print('request.values', request.values)
-    print('request.args', request.args)
-    print('request.data', request.data)
-    print('request.authorization', request.authorization)
-
-
-@app.route("/logout", methods=[POST])
-def register():
     pass
 
 
-@app.route("/recipes", methods=[GET])
+@app.route("/ping", methods=[GET])
+def ping():
+    return "Pong"
+
+
+def get_token(headers: Headers):
+    authorization = headers.get('Authorization', '')
+    token = authorization.split("Bearer ")
+    if len(token):
+        return token[-1]
+
+
+@app.route("/recipe", methods=[GET])
 def get_user_recipes():
-    pass
+    token = get_token(request.headers)
+    if token is None:
+        return "No valid auth token found", 401
+    is_authenticated = session_repository.is_authenticated(token)
+    if not is_authenticated:
+        return "No valid auth token found", 401
+
+    # data = json.loads(request.data)
+    # token = data.get('token', '')
+    return jsonify(items=[])
 
 
 @app.route("/recipe", methods=[POST])
@@ -55,22 +76,22 @@ def post_user_recipe():
     pass
 
 
-@app.route("/brasses", methods=[GET])
+@app.route("/brass", methods=[GET])
 def get_brasses():
     pass
 
 
-@app.route("/bullets", methods=[GET])
+@app.route("/bullet", methods=[GET])
 def get_bullets():
     pass
 
 
-@app.route("/calibers", methods=[GET])
+@app.route("/caliber", methods=[GET])
 def get_calibers():
     pass
 
 
-@app.route("/chambers", methods=[GET])
+@app.route("/chamber", methods=[GET])
 def get_chambers():
     pass
 
@@ -80,12 +101,12 @@ def get_manufacturer():
     pass
 
 
-@app.route("/powders", methods=[GET])
+@app.route("/powder", methods=[GET])
 def get_powders():
     pass
 
 
-@app.route("/primers", methods=[GET])
+@app.route("/primer", methods=[GET])
 def get_primers():
     pass
 

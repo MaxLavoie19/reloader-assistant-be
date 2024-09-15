@@ -1,1 +1,1 @@
-flask --app recipe_book run
+flask --app recipe_book_main run --host=0.0.0.0 --port=8765 --debug

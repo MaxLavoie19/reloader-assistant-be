@@ -12,6 +12,13 @@ class SessionRepository:
         self.credential_repository = credential_repository
         self.active_sessions = {}
 
+    def register(self, email: str, password: str) -> bool:
+        is_unique = self.credential_repository.is_email_unique(email)
+        if not is_unique:
+            return False
+        self.credential_repository.create_user(email, password)
+        return True;
+
     def authenticate(self, email: str, password: str) -> str:
         if self.credential_repository.authenticate_user(email, password):
             authentication_token = token_urlsafe(128)
@@ -21,7 +28,6 @@ class SessionRepository:
                 EXPIRATION_KEY: datetime.now() + timedelta(days=1), EMAIL_KEY: email
             }
             return authentication_token
-        return ''
 
     def logout(self, token: str):
         if token in self.active_sessions:

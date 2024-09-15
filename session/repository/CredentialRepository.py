@@ -26,6 +26,8 @@ class CredentialRepository:
 
     def authenticate_user(self, email: str, password: str) -> bool:
         user = self.credentials_serializer_service.load(email)
+        if user is None:
+            return False
         return self.cryptographic_hash_service.is_match(password, user.password_hash)
 
     def deactivate_user(self, email):
