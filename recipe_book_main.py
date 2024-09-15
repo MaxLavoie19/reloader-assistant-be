@@ -11,6 +11,7 @@ from reload.mapper.BulletMapper import bullet_to_dict_mapper
 from reload.mapper.ChamberingMapper import chambering_to_dict_mapper
 from reload.mapper.PowderMapper import powder_to_dict_mapper
 from reload.mapper.PrimerMapper import primer_to_dict_mapper
+from reload.mapper.RecipeMapper import recipe_camel_to_dataclass
 from reload.model.BrassModel import BrassModel
 from reload.model.BulletModel import BulletModel
 from reload.model.CaliberModel import CaliberModel
@@ -18,7 +19,6 @@ from reload.model.ChamberingModel import ChamberingModel
 from reload.model.ManufacturerModel import ManufacturerModel
 from reload.model.PowderModel import PowderModel
 from reload.model.PrimerModel import PrimerModel
-from reload.model.RecipeModel import RecipeModel
 from reload.repository.ComponentRepository import ComponentRepository
 from reload.repository.RecipeRepository import RecipeRepository
 from server_io.service.FileService import FileService
@@ -31,13 +31,6 @@ from session.service.CryptographicHashService.BlowfishHashService import Blowfis
 
 POST = 'POST'
 GET = 'GET'
-BRASS_KEY = "brass"
-BULLET_KEY = "bullet"
-PRIMER_KEY = "primer"
-POWDER_KEY = "powder"
-CHAMBERING_KEY = "chambering"
-CALIBER_KEY = "caliber"
-MANUFACTURER_KEY = "manufacturer"
 
 app = Flask('__name__')
 CORS(app)
@@ -175,64 +168,19 @@ def get_primers():
 @authenticate
 def post_user_recipe(_token: str, user: UserModel):
     data = json.loads(request.data)
-    brass_dict = data.get(BRASS_KEY)
-    chambering_dict = brass_dict.get(CHAMBERING_KEY)
-    brass_manufacturer_dict = brass_dict.get(MANUFACTURER_KEY)
-    caliber_dict = chambering_dict.get(CALIBER_KEY)
-    brass_manufacturer = ManufacturerModel(**brass_manufacturer_dict)
-    caliber = CaliberModel(**caliber_dict)
-    chambering = ChamberingModel(**{**chambering_dict, 'caliber': caliber})
-    brass = BrassModel(**{**brass_dict, 'manufacturer': brass_manufacturer, 'chambering': chambering})
 
-    bullet_dict = data.get(BULLET_KEY)
-    bullet_manufacturer_dict = bullet_dict.get(MANUFACTURER_KEY)
-    bullet_manufacturer = ManufacturerModel(**bullet_manufacturer_dict)
-    bullet = BulletModel(
-        id=bullet_dict.get('id', ''),
-        caliber=caliber,
-        model=bullet_dict.get('model', ''),
-        weight_in_grains=bullet_dict.get('weightInGrains', ''),
-        g1_ballistic_coefficient=bullet_dict.get('g1BallisticCoefficient', ''),
-        g7_ballistic_coefficient=bullet_dict.get('g7BallisticCoefficient', ''),
-        sectional_density=bullet_dict.get('sectionalDensity', ''),
-        manufacturer=bullet_manufacturer
-    )
+    recipe = recipe_camel_to_dataclass(data)
 
-    primer_dict = data.get(PRIMER_KEY)
-    primer_manufacturer_dict = primer_dict.get(MANUFACTURER_KEY)
-    primer_manufacturer = ManufacturerModel(**primer_manufacturer_dict)
-    primer = PrimerModel(**{**primer_dict, 'manufacturer': primer_manufacturer})
-
-    powder_dict = data.get(POWDER_KEY)
-    powder_manufacturer_dict = powder_dict.get(MANUFACTURER_KEY)
-    powder_manufacturer = ManufacturerModel(**powder_manufacturer_dict)
-    powder = PowderModel(**{**powder_dict, 'manufacturer': powder_manufacturer})
-
-    recipe = RecipeModel(
-        id=data['id'],
-        name=data['name'],
-        bullet_seating_depth=data.get('bulletSeatingDepth', ''),
-        min_powder_quantity_grains=data.get('minPowderQuantityGrains', ''),
-        max_powder_quantity_grains=data.get('maxPowderQuantityGrains', ''),
-        cartridge_overall_length_mm=data.get('cartridgeOverallLengthMm', ''),
-        cartridge_base_to_ogive_mm=data.get('cartridgeBaseToOgiveMm', ''),
-        brass=brass,
-        bullet=bullet,
-        primer=primer,
-        powder=powder,
-        notes=data['notes']
-    )
-
-    component_repository.get_or_create_component('calibers', caliber.__dict__, id_key='name')
-    component_repository.get_or_create_component('chamberings', chambering_to_dict_mapper(chambering))
-    component_repository.get_or_create_component('manufacturers', brass_manufacturer.__dict__, id_key='name')
-    component_repository.get_or_create_component('manufacturers', bullet_manufacturer.__dict__, id_key='name')
-    component_repository.get_or_create_component('manufacturers', primer_manufacturer.__dict__, id_key='name')
-    component_repository.get_or_create_component('manufacturers', powder_manufacturer.__dict__, id_key='name')
-    component_repository.get_or_create_component('brasses', brass_to_dict_mapper(brass))
-    component_repository.get_or_create_component('bullets', bullet_to_dict_mapper(bullet))
-    component_repository.get_or_create_component('primers', primer_to_dict_mapper(primer))
-    component_repository.get_or_create_component('powders', powder_to_dict_mapper(powder))
+    component_repository.get_or_create_component('calibers', recipe.caliber.__dict__, id_key='name')
+    component_repository.get_or_create_component('chamberings', chambering_to_dict_mapper(recipe.brass.chambering))
+    component_repository.get_or_create_component('manufacturers', recipe.brass.manufacturer.__dict__, id_key='name')
+    component_repository.get_or_create_component('manufacturers', recipe.bullet.manufacturer.__dict__, id_key='name')
+    component_repository.get_or_create_component('manufacturers', recipe.primer.manufacturer.__dict__, id_key='name')
+    component_repository.get_or_create_component('manufacturers', recipe.powder.manufacturer.__dict__, id_key='name')
+    component_repository.get_or_create_component('brasses', brass_to_dict_mapper(recipe.brass))
+    component_repository.get_or_create_component('bullets', bullet_to_dict_mapper(recipe.bullet))
+    component_repository.get_or_create_component('primers', primer_to_dict_mapper(recipe.primer))
+    component_repository.get_or_create_component('powders', powder_to_dict_mapper(recipe.powder))
     recipe_repository.save_recipe(user.email, recipe)
     return 'Ok', 200
 

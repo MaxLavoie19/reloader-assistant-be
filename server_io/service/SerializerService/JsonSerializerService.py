@@ -1,4 +1,5 @@
 import dataclasses
+import sys
 from pathlib import Path
 from typing import Union, Dict, List
 
@@ -45,7 +46,8 @@ class JsonSerializerService:
         recipe_folders = Path(recipes_folder).iterdir()
         recipes = []
         for recipe_folder in recipe_folders:
-            recipe_file = self.get_recipe_file(recipe_folder.name)
+            recipe_file = self.get_recipe_file(f"{recipe_folder}")
+            print(recipe_file, file=sys.stderr)
             recipe_dict = self.json_file_service.load(recipe_file)
             recipe = RecipeModel(**recipe_dict)
             recipes.append(recipe)
