@@ -6,6 +6,7 @@ from reload.model import ManufacturerModel
 
 @dataclass
 class PowderModel:
+    id: str
     name: str
     manufacturer: ManufacturerModel
-    barcode: Union[str, None]
+    barcode: Union[str, None] = None

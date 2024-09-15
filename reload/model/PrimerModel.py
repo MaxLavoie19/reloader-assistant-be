@@ -6,7 +6,8 @@ from reload.model import ManufacturerModel
 
 @dataclass
 class PrimerModel:
+    id: str
     name: str
     size: str
     manufacturer: ManufacturerModel
-    barcode: Union[str, None]
+    barcode: Union[str, None] = None

@@ -11,9 +11,9 @@ class ComponentRepository:
         components = self.serializer_service.load_public_file(component_type_name)
         return components
 
-    def get_or_create_component(self, component_type_name: str, component_dict: Dict):
+    def get_or_create_component(self, component_type_name: str, component_dict: Dict, id_key='id'):
         components = self.get_component_list(component_type_name)
-        filtered_components = list(filter(lambda x: x["id"] == component_dict["id"], components))
+        filtered_components = list(filter(lambda x: x[id_key] == component_dict[id_key], components))
         if len(filtered_components):
             return filtered_components[0]
         components.append(component_dict)

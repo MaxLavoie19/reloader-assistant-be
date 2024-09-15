@@ -51,6 +51,12 @@ class JsonSerializerService:
             recipes.append(recipe)
         return recipes
 
+    def dump_recipe(self, email: str, recipe_dict: Dict):
+        recipe_folder = self.get_recipe_folder(email, recipe_dict['name'])
+        Path(recipe_folder).mkdir(parents=True, exist_ok=True)
+        recipe_file = self.get_recipe_file(recipe_folder)
+        self.json_file_service.save(recipe_file, recipe_dict)
+
     def load_sessions(self) -> Dict[str, Dict]:
         return self.json_file_service.load(SESSIONS_FILE_PATH)
 
