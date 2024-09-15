@@ -6,6 +6,14 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from werkzeug.datastructures.headers import Headers
 
+from reload.model.BrassModel import BrassModel
+from reload.model.BulletModel import BulletModel
+from reload.model.CaliberModel import CaliberModel
+from reload.model.ChamberingModel import ChamberingModel
+from reload.model.ManufacturerModel import ManufacturerModel
+from reload.model.PowderModel import PowderModel
+from reload.model.PrimerModel import PrimerModel
+from reload.repository.ComponentRepository import ComponentRepository
 from server_io.service.FileService import FileService
 from session.model.UserModel import UserModel
 from session.repository.CredentialRepository import CredentialRepository
@@ -28,6 +36,8 @@ credential_repository = CredentialRepository(
     cryptographic_hash_service=blowfish_hash_service
 )
 session_repository = SessionRepository(credential_repository, serializer_service)
+
+component_repository = ComponentRepository(serializer_service)
 
 
 def get_token(headers: Headers):
@@ -77,49 +87,76 @@ def ping():
 @app.route("/recipes", methods=[GET])
 @authenticate
 def get_user_recipes(_token: str, user: UserModel):
-    print('user.email', user.email, file=sys.stderr)
     recipes = serializer_service.get_recipes(user.email)
     return jsonify(items=recipes)
+
+
+@app.route("/chamberings", methods=[GET])
+def get_chamberings():
+    chambering_dicts = component_repository.get_component_list("chamberings")
+    chamberings = []
+    for chambering_dict in chambering_dicts:
+        chamberings.append(ChamberingModel(**chambering_dict))
+    return jsonify(items=chamberings)
+
+
+@app.route("/brasses", methods=[GET])
+def get_brasses():
+    brass_dicts = component_repository.get_component_list("brasses")
+    brasses = []
+    for brass_dict in brass_dicts:
+        brasses.append(BrassModel(**brass_dict))
+    return jsonify(items=brasses)
+
+
+@app.route("/bullets", methods=[GET])
+def get_bullets():
+    bullet_dicts = component_repository.get_component_list("bullets")
+    bullets = []
+    for bullet_dict in bullet_dicts:
+        bullets.append(BulletModel(**bullet_dict))
+    return jsonify(items=bullets)
+
+
+@app.route("/calibers", methods=[GET])
+def get_calibers():
+    caliber_dicts = component_repository.get_component_list("calibers")
+    calibers = []
+    for caliber_dict in caliber_dicts:
+        calibers.append(CaliberModel(**caliber_dict))
+    return jsonify(items=calibers)
+
+
+@app.route("/manufacturers", methods=[GET])
+def get_manufacturer():
+    manufacturer_dicts = component_repository.get_component_list("manufacturers")
+    manufacturers = []
+    for manufacturer_dict in manufacturer_dicts:
+        manufacturers.append(ManufacturerModel(**manufacturer_dict))
+    return jsonify(items=manufacturers)
+
+
+@app.route("/powders", methods=[GET])
+def get_powders():
+    powder_dicts = component_repository.get_component_list("powders")
+    powders = []
+    for powder_dict in powder_dicts:
+        powders.append(PowderModel(**powder_dict))
+    return jsonify(items=powders)
+
+
+@app.route("/primers", methods=[GET])
+def get_primers():
+    primer_dicts = component_repository.get_component_list("primers")
+    primers = []
+    for primer_dict in primer_dicts:
+        primers.append(PrimerModel(**primer_dict))
+    return jsonify(items=primers)
 
 
 @app.route("/recipe", methods=[POST])
 def post_user_recipe():
     # Add all inexisting sub types (brass, bullet, powder, primer, etc....)
-    pass
-
-
-@app.route("/brass", methods=[GET])
-def get_brasses():
-    pass
-
-
-@app.route("/bullet", methods=[GET])
-def get_bullets():
-    pass
-
-
-@app.route("/caliber", methods=[GET])
-def get_calibers():
-    pass
-
-
-@app.route("/chamber", methods=[GET])
-def get_chambers():
-    pass
-
-
-@app.route("/manufacturer", methods=[GET])
-def get_manufacturer():
-    pass
-
-
-@app.route("/powder", methods=[GET])
-def get_powders():
-    pass
-
-
-@app.route("/primer", methods=[GET])
-def get_primers():
     pass
 
 # TODO: prebuilt recipes (hornady match, etc...)

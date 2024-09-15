@@ -64,7 +64,7 @@ class JsonSerializerService:
 
     def load_public_file(self, component_type_name: str) -> List[Dict]:
         file = self.get_public_file(component_type_name)
-        Path(file).mkdir(parents=True, exist_ok=True)
+        Path("data").mkdir(parents=True, exist_ok=True)
         components = self.json_file_service.load(file)
         if components is None:
             return []
