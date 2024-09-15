@@ -6,6 +6,8 @@ from reload.model.RecipeModel import RecipeModel
 from server_io.service.FileService import FileService
 from session.model.UserModel import UserModel
 
+SESSIONS_FILE_PATH = "./data/sessions.json"
+
 
 class JsonSerializerService:
     def __init__(self, json_file_service: FileService):
@@ -39,6 +41,7 @@ class JsonSerializerService:
 
     def get_recipes(self, email: str):
         recipes_folder = self.get_recipes_folder(email)
+        Path(recipes_folder).mkdir(parents=True, exist_ok=True)
         recipe_folders = Path(recipes_folder).iterdir()
         recipes = []
         for recipe_folder in recipe_folders:
@@ -48,6 +51,12 @@ class JsonSerializerService:
             recipes.append(recipe)
         return recipes
 
+    def load_sessions(self) -> Dict[str, Dict]:
+        return self.json_file_service.load(SESSIONS_FILE_PATH)
+
+    def dump_sessions(self, sessions: Dict[str, Dict]):
+        self.json_file_service.save(SESSIONS_FILE_PATH, sessions)
+
     def get_user_file(self, email: str):
         user_folder = self.get_user_folder(email)
         Path(user_folder).mkdir(parents=True, exist_ok=True)
@@ -55,6 +64,7 @@ class JsonSerializerService:
 
     def load_public_file(self, component_type_name: str) -> List[Dict]:
         file = self.get_public_file(component_type_name)
+        Path(file).mkdir(parents=True, exist_ok=True)
         components = self.json_file_service.load(file)
         if components is None:
             return []

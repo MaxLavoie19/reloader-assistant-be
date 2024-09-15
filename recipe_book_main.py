@@ -1,4 +1,5 @@
 import json
+import sys
 from typing import Callable
 
 from flask import Flask, request, jsonify
@@ -26,7 +27,7 @@ credential_repository = CredentialRepository(
     serializer_service=serializer_service,
     cryptographic_hash_service=blowfish_hash_service
 )
-session_repository = SessionRepository(credential_repository)
+session_repository = SessionRepository(credential_repository, serializer_service)
 
 
 def get_token(headers: Headers):
@@ -75,8 +76,10 @@ def ping():
 
 @app.route("/recipes", methods=[GET])
 @authenticate
-def get_user_recipes(token: str, user: UserModel):
-    return jsonify(items=[])
+def get_user_recipes(_token: str, user: UserModel):
+    print('user.email', user.email, file=sys.stderr)
+    recipes = serializer_service.get_recipes(user.email)
+    return jsonify(items=recipes)
 
 
 @app.route("/recipe", methods=[POST])
