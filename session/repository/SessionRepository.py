@@ -11,8 +11,11 @@ from session.repository.CredentialRepository import CredentialRepository
 class SessionRepository:
     def __init__(self, credential_repository: CredentialRepository, serializer_service: JsonSerializerService):
         self.credential_repository = credential_repository
-        self.active_sessions: Dict[str, SessionModel] = {}
         self.serializer_service = serializer_service
+        self.active_sessions: Dict[str, SessionModel] = {}
+        sessions = self.serializer_service.load_sessions()
+        for token, session_dict in sessions.items():
+            self.active_sessions[token] = SessionModel(**session_dict)
 
     def register(self, email: str, password: str) -> bool:
         is_unique = self.credential_repository.is_email_unique(email)
