@@ -1,7 +1,10 @@
+import base64
 import json
 import sys
+import zlib
 from typing import Callable
 
+import qrcode
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from werkzeug.datastructures.headers import Headers
@@ -170,8 +173,12 @@ def post_user_recipe(_token: str, user: UserModel):
     data = json.loads(request.data)
 
     recipe = recipe_camel_to_dataclass(data)
+    qr_image = qrcode.make(recipe.id)
+    folder = serializer_service.get_recipe_folder(user.email, data['name'])
+    qr_image_file = f"{folder}/qr.png"
+    qr_image.save(qr_image_file)
 
-    component_repository.get_or_create_component('calibers', recipe.caliber.__dict__, id_key='name')
+    component_repository.get_or_create_component('calibers', recipe.brass.chambering.caliber.__dict__, id_key='name')
     component_repository.get_or_create_component('chamberings', chambering_to_dict_mapper(recipe.brass.chambering))
     component_repository.get_or_create_component('manufacturers', recipe.brass.manufacturer.__dict__, id_key='name')
     component_repository.get_or_create_component('manufacturers', recipe.bullet.manufacturer.__dict__, id_key='name')
@@ -182,8 +189,12 @@ def post_user_recipe(_token: str, user: UserModel):
     component_repository.get_or_create_component('primers', primer_to_dict_mapper(recipe.primer))
     component_repository.get_or_create_component('powders', powder_to_dict_mapper(recipe.powder))
     recipe_repository.save_recipe(user.email, recipe)
-    return 'Ok', 200
+    return jsonify(data='Ok'), 200
 
+
+@app.route("/recipe/<name>/qr", methods=[GET])
+def get_recipe_qr():
+    pass
 
 # TODO: prebuilt recipes (hornady match, etc...)
 # TODO: std over dates

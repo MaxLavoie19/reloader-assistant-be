@@ -1,3 +1,5 @@
+import json
+import zlib
 from typing import Dict
 
 from reload.mapper.BrassMapper import brass_to_dict_mapper
@@ -88,3 +90,39 @@ def recipe_camel_to_dataclass(recipe_dict: Dict):
         notes=recipe_dict['notes']
     )
     return recipe
+
+
+def recipe_to_qr_mapper(recipe: RecipeModel):
+    # TODO: ? Use Id only. Good enough for double blind.
+    brass: BrassModel = recipe.brass
+    brass_value_list = []
+
+    bullet: BulletModel = recipe.bullet
+    bullet_value_list = []
+
+    primer: PrimerModel = recipe.primer
+    primer_value_list = []
+
+    powder: PowderModel = recipe.powder
+    powder_value_list = []
+
+    recipe_value_list = [
+        recipe.id,
+        recipe.name,
+        brass_value_list,
+        bullet_value_list,
+        primer_value_list,
+        recipe.powder,
+        recipe.bullet_seating_depth or '',
+        recipe.min_powder_quantity_grains or 0,
+        recipe.max_powder_quantity_grains or 0,
+        recipe.cartridge_overall_length_mm or 0,
+        recipe.cartridge_base_to_ogive_mm or 0,
+        recipe.notes or '',
+    ]
+    recipe_string = json.dumps(recipe_value_list)
+    compressed_recipe = zlib.compress(recipe_string.encode())
+
+
+def qr_to_recipe_mapper(recipe_string: str):
+    pass
