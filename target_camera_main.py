@@ -81,6 +81,7 @@ def record(
   pressure_filter_state: KalmanFilterStateModel,
   humidity_filter_state: KalmanFilterStateModel,
   kalman_filter_service: KalmanFilterService,
+  last_second: int,
 ):
   out.write(frame)
   croped_frame = ready(ui_state_model, frame)
@@ -95,7 +96,7 @@ def record(
       humidity_filter_state,
       kalman_filter_service,
     )
-  return croped_frame
+  return croped_frame, last_second
 
 
 def ready(ui_state_model: UIStateModel, frame: cv2.typing.MatLike):
@@ -157,7 +158,7 @@ while cap.isOpened():
   elif ui_state_model.current_step == READY_STEP:
     frame = ready(ui_state_model, frame)
   elif ui_state_model.current_step == RECORDING_STEP:
-    frame = record(
+    frame, last_second = record(
       ui_state_model,
       frame,
       bme280,
@@ -165,6 +166,7 @@ while cap.isOpened():
       pressure_filter_state,
       humidity_filter_state,
       kalman_filter_service,
+      last_second,
     )
     temperatures.append(temperature_filter_state.__dict__)
     pressures.append(pressure_filter_state.__dict__)
