@@ -186,7 +186,7 @@ while cap.isOpened():
     elif ui_state_model.current_step == RECORDING_STEP:
       out.release()
       if len(temperatures):
-        with open(f"{video_filename}.json") as destination:
+        with open(f"{video_filename}.json", 'w') as destination:
           json.dump(
             { "temperatures": temperatures, "pressures": pressures, "humidities": humidities },
             destination,
