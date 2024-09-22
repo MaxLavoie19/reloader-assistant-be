@@ -1,7 +1,8 @@
 import math
 
-from models.KalmanFilterStateModel import KalmanFilterStateModel
-from services.FitnessService import FitnessService
+from filtering.model.KalmanFilterStateModel import KalmanFilterStateModel
+from filtering.service.FitnessService import FitnessService
+
 
 
 class KalmanFilterService:
