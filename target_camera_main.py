@@ -85,13 +85,16 @@ def record(
   out.write(frame)
   croped_frame = ready(ui_state_model, frame)
   image_editing_service.add_recording_circle(croped_frame)
-  update_air_condition(
-    sensor,
-    temperature_filter_state,
-    pressure_filter_state,
-    humidity_filter_state,
-    kalman_filter_service,
-  )
+  now = datetime.now()
+  if last_second != now.second:
+    last_second = now.second
+    update_air_condition(
+      sensor,
+      temperature_filter_state,
+      pressure_filter_state,
+      humidity_filter_state,
+      kalman_filter_service,
+    )
   return croped_frame
 
 
@@ -113,6 +116,7 @@ calibration_service = CalibrationService()
 user_input_service = UserInputService()
 fitness_service = FitnessService()
 kalman_filter_service = KalmanFilterService(fitness_service)
+last_second = 0
 
 ui_state_model = UIStateModel(
   target_width=TARGET_WIDTH,
