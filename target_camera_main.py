@@ -9,7 +9,7 @@ from camera.model.UIStateModel import UIStateModel
 from camera.service.CalibrationService import CalibrationService
 from camera.service.ImageEditingService import ImageEditingService
 from camera.service.UserInputService import UserInputService
-from filtering.model import KalmanFilterStateModel
+from filtering.model.KalmanFilterStateModel import KalmanFilterStateModel
 from filtering.service.FitnessService import FitnessService
 from filtering.service.KalmanFilterService import KalmanFilterService
 from reload.constant.TargetConstants import TARGET_SIZE_RATIO
