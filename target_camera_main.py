@@ -10,6 +10,7 @@ from camera.service.CalibrationService import CalibrationService
 from camera.service.ImageEditingService import ImageEditingService
 from camera.service.UserInputService import UserInputService
 from filtering.model import KalmanFilterStateModel
+from filtering.service.FitnessService import FitnessService
 from filtering.service.KalmanFilterService import KalmanFilterService
 from reload.constant.TargetConstants import TARGET_SIZE_RATIO
 
@@ -110,6 +111,7 @@ RECORDING_STEP = "Recording"
 image_editing_service = ImageEditingService()
 calibration_service = CalibrationService()
 user_input_service = UserInputService()
+fitness_service = FitnessService()
 kalman_filter_service = KalmanFilterService()
 
 ui_state_model = UIStateModel(
