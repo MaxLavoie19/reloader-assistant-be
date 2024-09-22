@@ -180,20 +180,20 @@ while cap.isOpened():
       ui_state_model.current_step = READY_STEP
     elif ui_state_model.current_step == READY_STEP:
       video_filename = get_filename(size)
+      ui_state_model.current_step = RECORDING_STEP
+      fourcc = cv2.VideoWriter_fourcc(*'XVID')
+      out = cv2.VideoWriter(video_filename, fourcc, 20.0, size)
+    elif ui_state_model.current_step == RECORDING_STEP:
+      out.release()
       if len(temperatures):
         with open(f"{video_filename}.json") as destination:
           json.dump(
             { "temperatures": temperatures, "pressures": pressures, "humidities": humidities },
             destination,
           )
-      ui_state_model.current_step = RECORDING_STEP
-      fourcc = cv2.VideoWriter_fourcc(*'XVID')
-      out = cv2.VideoWriter(video_filename, fourcc, 20.0, size)
       temperatures = []
       pressures = []
       humidities = []
-    elif ui_state_model.current_step == RECORDING_STEP:
-      out.release()
       ui_state_model.current_step = READY_STEP
 
 out.release()
