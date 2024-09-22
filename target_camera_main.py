@@ -160,6 +160,7 @@ while cap.isOpened():
       temperature_filter_state,
       pressure_filter_state,
       humidity_filter_state,
+      kalman_filter_service,
     )
     temperatures.append(temperature_filter_state.__dict__)
     pressures.append(pressure_filter_state.__dict__)
