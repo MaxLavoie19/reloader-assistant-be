@@ -7,6 +7,14 @@ class ImageEditingService:
     gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     return gray_image
 
+  def add_recording_circle(self, image: cv2.typing.MatLike):
+    ratio = 20.0
+    corner_distance = int(min(image.shape[:1]) / ratio)
+    center = (corner_distance, corner_distance)
+    radius = int(corner_distance / 3.0)
+    thickness = radius
+    cv2.circle(image, center, radius, (0, 0, 255), thickness)
+
   def crop_image(self, image: cv2.typing.MatLike, x1: int, y1: int, x2: int, y2: int):
     croped_image = image[y1:y2, x1:x2]
     return croped_image

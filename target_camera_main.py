@@ -1,42 +1,30 @@
+from datetime import datetime
+import json
 from pathlib import Path
 import cv2
+import board
+from adafruit_bme280 import basic
 
 from camera.model.UIStateModel import UIStateModel
 from camera.service.CalibrationService import CalibrationService
 from camera.service.ImageEditingService import ImageEditingService
 from camera.service.UserInputService import UserInputService
+from filtering.model import KalmanFilterStateModel
+from filtering.service.KalmanFilterService import KalmanFilterService
 from reload.constant.TargetConstants import TARGET_SIZE_RATIO
 
 
-WINDOW_NAME = "frame"
-DESIRED_RESOLUTION = (1280, 960)
-TARGET_WIDTH = 110
-CALIBRATION_STEP = "Calibration"
-RECORDING_STEP = "Recording"
-
-image_editing_service = ImageEditingService()
-calibration_service = CalibrationService()
-user_input_service = UserInputService()
-
-ui_state_model = UIStateModel(
-  target_width=TARGET_WIDTH,
-  target_height=TARGET_WIDTH * TARGET_SIZE_RATIO,
-  left_offset=0,
-  top_offset=0,
-  quit=False,
-  is_done=False,
-  current_step=CALIBRATION_STEP,
-)
-
-cap = cv2.VideoCapture(0)
-cap.set(cv2.CAP_PROP_FRAME_WIDTH, DESIRED_RESOLUTION[0])
-cap.set(cv2.CAP_PROP_FRAME_HEIGHT, DESIRED_RESOLUTION[1])
-frame_shape = cap.read()[1].shape
-size = (frame_shape[1], frame_shape[0])
-print(size)
-
-cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_NORMAL)
-cv2.setWindowProperty(WINDOW_NAME, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
+def update_air_condition(
+  sensor: basic.Adafruit_BME280,
+  temperature_filter_state: KalmanFilterStateModel,
+  pressure_filter_state: KalmanFilterStateModel,
+  humidity_filter_state: KalmanFilterStateModel,
+  kalman_filter_service: KalmanFilterService,
+):
+  now = datetime.now().timestamp()
+  kalman_filter_service.kalman_filter(temperature_filter_state, sensor.temperature, 1, now)
+  kalman_filter_service.kalman_filter(pressure_filter_state, sensor.pressure, 1, now)
+  kalman_filter_service.kalman_filter(humidity_filter_state, sensor.humidity, 1, now)
 
 
 def get_filename(size):
@@ -84,19 +72,96 @@ def calibrate(ui_state_model: UIStateModel, frame: cv2.typing.MatLike):
   image_editing_service.print(frame, f'bluriness {bluriness:0.4f}', (100, 100))
 
 
-def record(ui_state_model: UIStateModel, frame: cv2.typing.MatLike):
+def record(
+  ui_state_model: UIStateModel,
+  frame: cv2.typing.MatLike,
+  sensor: basic.Adafruit_BME280,
+  temperature_filter_state: KalmanFilterStateModel,
+  pressure_filter_state: KalmanFilterStateModel,
+  humidity_filter_state: KalmanFilterStateModel,
+  kalman_filter_service: KalmanFilterService,
+):
+  out.write(frame)
+  croped_frame = ready(ui_state_model, frame)
+  image_editing_service.add_recording_circle(croped_frame)
+  update_air_condition(
+    sensor,
+    temperature_filter_state,
+    pressure_filter_state,
+    humidity_filter_state,
+    kalman_filter_service,
+  )
+  return croped_frame
+
+
+def ready(ui_state_model: UIStateModel, frame: cv2.typing.MatLike):
   target_rectangle = get_target_rectangle(ui_state_model, frame)
   croped_frame = image_editing_service.crop_image(frame, *target_rectangle)
-  out.write(frame)
   return croped_frame
+
+
+WINDOW_NAME = "frame"
+DESIRED_RESOLUTION = (1280, 960)
+TARGET_WIDTH = 110
+CALIBRATION_STEP = "Calibration"
+READY_STEP = "Ready"
+RECORDING_STEP = "Recording"
+
+image_editing_service = ImageEditingService()
+calibration_service = CalibrationService()
+user_input_service = UserInputService()
+kalman_filter_service = KalmanFilterService()
+
+ui_state_model = UIStateModel(
+  target_width=TARGET_WIDTH,
+  target_height=TARGET_WIDTH * TARGET_SIZE_RATIO,
+  left_offset=0,
+  top_offset=0,
+  quit=False,
+  is_done=False,
+  current_step=CALIBRATION_STEP,
+)
+
+temperature_filter_state = KalmanFilterStateModel()
+pressure_filter_state = KalmanFilterStateModel()
+humidity_filter_state = KalmanFilterStateModel()
+
+temperatures = []
+pressures = []
+humidities = []
+
+cap = cv2.VideoCapture(0)
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, DESIRED_RESOLUTION[0])
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, DESIRED_RESOLUTION[1])
+frame_shape = cap.read()[1].shape
+size = (frame_shape[1], frame_shape[0])
+print(size)
+
+i2c = board.I2C()
+bme280 = basic.Adafruit_BME280_I2C(i2c, address=0x76)
+
+cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_NORMAL)
+cv2.setWindowProperty(WINDOW_NAME, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
 
 
 while cap.isOpened():
   ret, frame = cap.read()
   if ui_state_model.current_step == CALIBRATION_STEP:
     calibrate(ui_state_model, frame)
+  elif ui_state_model.current_step == READY_STEP:
+    frame = ready(ui_state_model, frame)
   elif ui_state_model.current_step == RECORDING_STEP:
-    frame = record(ui_state_model, frame)
+    frame = record(
+      ui_state_model,
+      frame,
+      bme280,
+      temperature_filter_state,
+      pressure_filter_state,
+      humidity_filter_state,
+    )
+    temperatures.append(temperature_filter_state.__dict__)
+    pressures.append(pressure_filter_state.__dict__)
+    humidities.append(humidity_filter_state.__dict__)
 
   if not ret:
     print("Can't receive frame (stream end?). Exiting ...")
@@ -109,16 +174,24 @@ while cap.isOpened():
   elif ui_state_model.is_done:
     ui_state_model.is_done = False
     if ui_state_model.current_step == CALIBRATION_STEP:
-      ui_state_model.current_step = RECORDING_STEP
+      ui_state_model.current_step = READY_STEP
+    elif ui_state_model.current_step == READY_STEP:
       video_filename = get_filename(size)
+      if len(temperatures):
+        with open(f"{video_filename}.json") as destination:
+          json.dump(
+            { "temperatures": temperatures, "pressures": pressures, "humidities": humidities },
+            destination,
+          )
+      ui_state_model.current_step = RECORDING_STEP
       fourcc = cv2.VideoWriter_fourcc(*'XVID')
       out = cv2.VideoWriter(video_filename, fourcc, 20.0, size)
+      temperatures = []
+      pressures = []
+      humidities = []
     elif ui_state_model.current_step == RECORDING_STEP:
       out.release()
-      ui_state_model.current_step = RECORDING_STEP
-      video_filename = get_filename(size)
-      fourcc = cv2.VideoWriter_fourcc(*'XVID')
-      out = cv2.VideoWriter(video_filename, fourcc, 20.0, size)
+      ui_state_model.current_step = READY_STEP
 
 out.release()
 cap.release()
