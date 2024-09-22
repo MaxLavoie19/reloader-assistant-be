@@ -112,7 +112,7 @@ image_editing_service = ImageEditingService()
 calibration_service = CalibrationService()
 user_input_service = UserInputService()
 fitness_service = FitnessService()
-kalman_filter_service = KalmanFilterService()
+kalman_filter_service = KalmanFilterService(fitness_service)
 
 ui_state_model = UIStateModel(
   target_width=TARGET_WIDTH,
