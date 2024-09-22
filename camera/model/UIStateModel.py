@@ -8,3 +8,5 @@ class UIStateModel:
   top_offset: int
   left_offset: int
   quit: bool
+  is_done: bool
+  current_step: str

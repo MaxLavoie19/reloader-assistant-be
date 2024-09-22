@@ -8,6 +8,7 @@ UP_ARROW_CODE = 2490368
 DOWN_ARROW_CODE = 2621440
 LEFT_ARROW_CODE = 2424832
 RIGHT_ARROW_CODE = 2555904
+ENTER_CODE = 13
 
 
 class UserInputService:
@@ -40,5 +41,7 @@ class UserInputService:
         ui_state_model.left_offset -= offset_increment
     elif key_input == RIGHT_ARROW_CODE:
         ui_state_model.left_offset += offset_increment
+    elif key_input == ENTER_CODE:
+       ui_state_model.is_done = True
     elif key_input != -1:
         print(key_input)

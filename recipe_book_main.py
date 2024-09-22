@@ -1,7 +1,5 @@
-import base64
 import json
 import sys
-import zlib
 from typing import Callable
 
 import qrcode

@@ -11,6 +11,18 @@ class ImageEditingService:
     croped_image = image[y1:y2, x1:x2]
     return croped_image
 
+  def draw_rectangle(
+      self,
+      image: cv2.typing.MatLike,
+      x1: int,
+      y1: int,
+      x2: int,
+      y2: int,
+      color: Tuple[int, int, int],
+      thickness: int,
+    ):
+    cv2.rectangle(image, (x1, y1), (x2, y2), color=color, thickness=thickness)
+
   def print(self, image: cv2.typing.MatLike, text: str, text_bottom_left: Tuple[int, int]):
     font = cv2.FONT_HERSHEY_DUPLEX
     font_scale = 2
