@@ -15,6 +15,14 @@ from filtering.service.KalmanFilterService import KalmanFilterService
 from reload.constant.TargetConstants import TARGET_SIZE_RATIO
 
 
+WINDOW_NAME = "frame"
+DESIRED_RESOLUTION = (1280, 720)
+TARGET_WIDTH = 220
+CALIBRATION_STEP = "Calibration"
+READY_STEP = "Ready"
+RECORDING_STEP = "Recording"
+
+
 def update_air_condition(
   sensor: basic.Adafruit_BME280,
   temperature_filter_state: KalmanFilterStateModel,
@@ -103,14 +111,6 @@ def ready(ui_state_model: UIStateModel, frame: cv2.typing.MatLike):
   target_rectangle = get_target_rectangle(ui_state_model, frame)
   croped_frame = image_editing_service.crop_image(frame, *target_rectangle)
   return croped_frame
-
-
-WINDOW_NAME = "frame"
-DESIRED_RESOLUTION = (1280, 960)
-TARGET_WIDTH = 110
-CALIBRATION_STEP = "Calibration"
-READY_STEP = "Ready"
-RECORDING_STEP = "Recording"
 
 image_editing_service = ImageEditingService()
 calibration_service = CalibrationService()
