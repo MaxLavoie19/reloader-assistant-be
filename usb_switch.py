@@ -1,11 +1,18 @@
 import gpiod
 
-USB_PIN = 7
+from gpiod.line import Direction, Value
 
-chip = gpiod.Chip('/dev/gpiochip0')
-usb_line = chip.get_line(USB_PIN)
-usb_line.request(consumer="USB switch", type=gpiod.LINE_REQ_DIR_OUT)
-usb_line.set_value(1)
-input('Switch?')
-usb_line.set_value(0)
-usb_line.release()
+LINE = 4
+
+with gpiod.request_lines(
+    "/dev/gpiochip0",
+    consumer="blink-example",
+    config={
+        LINE: gpiod.LineSettings(
+            direction=Direction.OUTPUT, output_value=Value.ACTIVE
+        )
+    },
+) as request:
+    request.set_value(LINE, Value.ACTIVE)
+    input("Switch?")
+    request.set_value(LINE, Value.INACTIVE)
