@@ -13,6 +13,7 @@ from session.mapper.FitFileToRadarShotMapper import fit_file_to_radar_shots_mapp
 
 USB_POWER_NC = 5
 USB_DATA_NO = 6
+GARMIN_FOLDER_PATH = "/media/pi5user/GARMIN/Garmin/Shot_Sessions/"
 
 user_folder_service = UserFolderService()
 json_file_service = FileService()
@@ -21,11 +22,10 @@ json_serializer_service = JsonSerializerService(json_file_service, user_folder_s
 
 def get_fit_file_paths(garmin_path: str, user_file_path: str):
   file_paths = [
-    join(garmin_path, f)
-    for f in listdir(garmin_path)
+    f for f in listdir(garmin_path)
     if isfile(join(garmin_path, f)) and not isfile(join(user_file_path, f)) and ".fit" in f
   ]
-  print(file_paths)
+
   return file_paths
 
 
@@ -42,8 +42,9 @@ with gpiod.request_lines(
   request.set_value(USB_DATA_NO, Value.ACTIVE)
   time.sleep(10)
 
+
   blocs_folder = user_folder_service.get_shooting_blocs_folder("maxlavoie1960@hotmail.com")
-  file_paths = get_fit_file_paths("/media/pi5user/GARMIN/Garmin/Shot_Sessions/", blocs_folder)
+  file_paths = get_fit_file_paths(GARMIN_FOLDER_PATH, blocs_folder)
 
   for file_path in file_paths:
     stream = Stream.from_file(file_path)
@@ -59,7 +60,7 @@ with gpiod.request_lines(
         shot_dict = radar_shot_to_dict(shot)
         shot_dicts.append(shot_dict)
 
-    json_serializer_service.dump_radar_readings(file_path, shot_dicts)
+    json_serializer_service.dump_radar_readings(f"{blocs_folder}/{file_path}", shot_dicts)
 
   print("Disconnecting radar")
   request.set_value(USB_DATA_NO, Value.INACTIVE)
