@@ -40,6 +40,7 @@ with gpiod.request_lines(
   print("Turning on data")
   request.set_value(USB_POWER_NC, Value.INACTIVE)
   request.set_value(USB_DATA_NO, Value.ACTIVE)
+  time.sleep(10)
 
   blocs_folder = user_folder_service.get_shooting_blocs_folder("maxlavoie1960@hotmail.com")
   file_paths = get_fit_file_paths("/media/pi5user/GARMIN/Garmin/Shot_sessions/", blocs_folder)
