@@ -23,7 +23,7 @@ def get_fit_file_paths(garmin_path: str, user_file_path: str):
   file_paths = [
     isfile(join(garmin_path, f))
     for f in listdir(garmin_path)
-    if isfile(join(garmin_path, f)) and not isfile(join(user_file_path, f)) and ".fit" in f
+    if (isfile(join(garmin_path, f)) and not isfile(join(user_file_path, f)) and ".fit" in f)
   ]
   print(file_paths)
   return file_paths
