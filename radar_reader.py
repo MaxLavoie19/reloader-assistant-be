@@ -8,13 +8,15 @@ from garmin_fit_sdk import Decoder, Stream
 
 from server_io.service.SerializerService.JsonSerializerService import JsonSerializerService
 from server_io.service.UserFolderService.UserFolderService import UserFolderService
+from server_io.service.FileService import FileService
 from session.mapper.FitFileToRadarShotMapper import fit_file_to_radar_shots_mapper
 
 USB_POWER_NC = 5
 USB_DATA_NO = 6
 
 user_folder_service = UserFolderService()
-json_serializer_service = JsonSerializerService(user_folder_service)
+json_file_service = FileService()
+json_serializer_service = JsonSerializerService(json_file_service, user_folder_service)
 
 
 def get_fit_file_paths(garmin_path: str, user_file_path: str):
