@@ -64,5 +64,4 @@ class JsonSerializerService:
     self.json_file_service.save(file_path, user_dict)
 
   def dump_radar_readings(self, file_path: str, shot_dicts: List[Dict]):
-    print(shot_dicts)
     self.json_file_service.save(file_path, shot_dicts)
