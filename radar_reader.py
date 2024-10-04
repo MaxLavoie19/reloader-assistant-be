@@ -25,7 +25,7 @@ def get_fit_file_paths(garmin_path: str, user_file_path: str):
     for f in listdir(garmin_path)
     if isfile(join(garmin_path, f)) and not isfile(join(user_file_path, f)) and ".fit" in f
   ]
-
+  print(file_paths)
   return file_paths
 
 
@@ -43,7 +43,7 @@ with gpiod.request_lines(
   time.sleep(10)
 
   blocs_folder = user_folder_service.get_shooting_blocs_folder("maxlavoie1960@hotmail.com")
-  file_paths = get_fit_file_paths("/media/pi5user/GARMIN/Garmin/Shot_sessions/", blocs_folder)
+  file_paths = get_fit_file_paths("/media/pi5user/GARMIN/Garmin/Shot_Sessions/", blocs_folder)
 
   for file_path in file_paths:
     stream = Stream.from_file(file_path)
