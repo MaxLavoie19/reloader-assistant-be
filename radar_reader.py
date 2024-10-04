@@ -61,7 +61,7 @@ with gpiod.request_lines(
         shot_dict = radar_shot_to_dict(shot)
         shot_dicts.append(shot_dict)
 
-    json_serializer_service.dump_radar_readings(f"{blocs_folder}/{file_path}", shot_dicts)
+    json_serializer_service.dump_radar_readings(f"{blocs_folder}/{file_path}.json", shot_dicts)
 
   print("Disconnecting radar")
   request.set_value(USB_DATA_NO, Value.INACTIVE)

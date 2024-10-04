@@ -33,7 +33,7 @@ def fit_file_to_radar_shots_mapper(radar_messages_dict: Dict) -> RadarShotModel:
 
 def radar_shot_to_dict(radar_shot: RadarShotModel):
     radar_dict = radar_shot.__dict__
-    radar_dict["timestamp"] = radar_shot.datetime.isoformat()
+    radar_dict["datetime"] = radar_shot.datetime.isoformat()
     return radar_dict
 
 
