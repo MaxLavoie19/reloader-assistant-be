@@ -50,6 +50,9 @@ with gpiod.request_lines(
     messages, errors = decoder.read()
 
     shots = fit_file_to_radar_shots_mapper(messages)
+    if len(shots) == 0:
+       continue
+
     shot_dicts = []
     for shot in shots:
         shot_dicts.append(shot.__dict__)
