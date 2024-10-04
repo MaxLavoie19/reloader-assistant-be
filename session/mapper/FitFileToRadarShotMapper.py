@@ -6,7 +6,9 @@ METER_TO_FEET_CONVERSION_CONSTANT = 3.28084
 
 
 def fit_file_to_radar_shots_mapper(radar_messages_dict: Dict):
-    print(radar_messages_dict)
+    if len(radar_messages_dict.keys()) == 0:
+        return []
+
     shot_dicts = radar_messages_dict['chrono_shot_data_mesgs']
     session_messages = radar_messages_dict['chrono_shot_session_mesgs']
     session_message = session_messages[0]
