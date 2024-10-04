@@ -5,7 +5,7 @@ from session.model.RadarShotModel import RadarShotModel
 METER_TO_FEET_CONVERSION_CONSTANT = 3.28084
 
 
-def fit_file_to_radar_shots_mapper(radar_messages_dict: Dict):
+def fit_file_to_radar_shots_mapper(radar_messages_dict: Dict) -> RadarShotModel:
     if len(radar_messages_dict.keys()) == 0:
         return []
 
@@ -29,6 +29,12 @@ def fit_file_to_radar_shots_mapper(radar_messages_dict: Dict):
         )
         shots.append(radar_shot)
     return shots
+
+
+def radar_shot_to_dict(radar_shot: RadarShotModel):
+    radar_dict = radar_shot.__dict__
+    radar_dict["timestamp"] = radar_shot.datetime.isoformat()
+    return radar_dict
 
 
 def energy_equation_joules(mass_grains, velocity_fps):

@@ -9,7 +9,7 @@ from garmin_fit_sdk import Decoder, Stream
 from server_io.service.SerializerService.JsonSerializerService import JsonSerializerService
 from server_io.service.UserFolderService.UserFolderService import UserFolderService
 from server_io.service.FileService import FileService
-from session.mapper.FitFileToRadarShotMapper import fit_file_to_radar_shots_mapper
+from session.mapper.FitFileToRadarShotMapper import fit_file_to_radar_shots_mapper, radar_shot_to_dict
 
 USB_POWER_NC = 5
 USB_DATA_NO = 6
@@ -56,7 +56,8 @@ with gpiod.request_lines(
 
     shot_dicts = []
     for shot in shots:
-        shot_dicts.append(shot.__dict__)
+        shot_dict = radar_shot_to_dict(shot)
+        shot_dicts.append(shot_dict)
 
     json_serializer_service.dump_radar_readings(file_path, shot_dicts)
 
