@@ -1,6 +1,6 @@
 import time
 from os import listdir
-from os.path import isfile, join
+from os.path import isfile, join, exists
 
 import gpiod
 from gpiod.line import Direction, Value
@@ -40,14 +40,15 @@ with gpiod.request_lines(
   print("Turning on data")
   request.set_value(USB_POWER_NC, Value.INACTIVE)
   request.set_value(USB_DATA_NO, Value.ACTIVE)
-  time.sleep(10)
+  while not exists(GARMIN_FOLDER_PATH):
+    time.sleep(1)
 
 
   blocs_folder = user_folder_service.get_shooting_blocs_folder("maxlavoie1960@hotmail.com")
   file_paths = get_fit_file_paths(GARMIN_FOLDER_PATH, blocs_folder)
 
   for file_path in file_paths:
-    stream = Stream.from_file(file_path)
+    stream = Stream.from_file(join(GARMIN_FOLDER_PATH, file_path))
     decoder = Decoder(stream)
     messages, errors = decoder.read()
 
