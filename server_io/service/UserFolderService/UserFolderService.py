@@ -24,11 +24,6 @@ class UserFolderService:
     Path(blocs_folder).mkdir(parents=True, exist_ok=True)
     return blocs_folder
 
-  def get_shots_file(self, email: str, shot_dicts: List[Dict]):
-    bloc_folder = self.get_shooting_blocs_folder(email)
-    shot_file_name = f"{bloc_folder}/{shot_dicts[0]["datetime"]}"
-    return shot_file_name
-
   def get_recipe_file(self, recipe_folder: str):
     return f"{recipe_folder}/recipe.json"
 
