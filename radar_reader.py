@@ -43,8 +43,8 @@ with gpiod.request_lines(
   blocs_folder = user_folder_service.get_shooting_blocs_folder("maxlavoie1960@hotmail.com")
   file_paths = get_fit_file_paths("/media/pi5user/GARMIN/Garmin/Shot_sessions/", blocs_folder)
 
-  for file in file_paths:
-    stream = Stream.from_file(file)
+  for file_path in file_paths:
+    stream = Stream.from_file(file_path)
     decoder = Decoder(stream)
     messages, errors = decoder.read()
 
@@ -53,7 +53,7 @@ with gpiod.request_lines(
     for shot in shots:
         shot_dicts.append(shot.__dict__)
 
-    json_serializer_service.dump_radar_readings(file, shot_dicts)
+    json_serializer_service.dump_radar_readings(file_path, shot_dicts)
 
   print("Disconnecting radar")
   request.set_value(USB_DATA_NO, Value.INACTIVE)
