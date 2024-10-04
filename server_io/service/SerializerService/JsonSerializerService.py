@@ -63,5 +63,5 @@ class JsonSerializerService:
     user_dict = dataclasses.asdict(user)
     self.json_file_service.save(file_path, user_dict)
 
-  def dump_radar_readings(self, email: str, shot_dicts: List[Dict]):
-    self.json_file_service.save(shot_file_name, shot_dicts)
+  def dump_radar_readings(self, file_path: str, shot_dicts: List[Dict]):
+    self.json_file_service.save(file_path, shot_dicts)
