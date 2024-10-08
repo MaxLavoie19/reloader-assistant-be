@@ -1,7 +1,30 @@
-from typing import Iterable
+from typing import Iterable, List
 import numpy as np
 
 import matplotlib.pyplot as plt
+from filtering.model.KalmanFilterStateModel import KalmanFilterStateModel
+
+
+def plot_kalman_filter_state_list(state_list: List[KalmanFilterStateModel]):
+    positions = []
+    position_variances = []
+    velocities = []
+    velocity_variances = []
+
+    for state in state_list:
+        positions.append(state['position'])
+        position_variances.append(state['position_variance'])
+        velocities.append(state['velocity'])
+        velocity_variances.append(state['velocity_variance'])
+
+    plot_kalman_filter_states(
+      positions,
+      position_variances,
+      velocities,
+      velocity_variances,
+      positions,
+      velocities,
+    )
 
 
 def plot_kalman_filter_states(

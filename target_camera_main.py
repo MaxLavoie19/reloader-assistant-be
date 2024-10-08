@@ -129,9 +129,9 @@ ui_state_model = UIStateModel(
   current_step=CALIBRATION_STEP,
 )
 
-temperature_filter_state = KalmanFilterStateModel()
-pressure_filter_state = KalmanFilterStateModel()
-humidity_filter_state = KalmanFilterStateModel()
+temperature_filter_state = KalmanFilterStateModel(min_velocity_variance=0.01)
+pressure_filter_state = KalmanFilterStateModel(min_velocity_variance=0.01)
+humidity_filter_state = KalmanFilterStateModel(min_velocity_variance=0.01)
 
 temperatures = []
 pressures = []
@@ -168,9 +168,9 @@ while cap.isOpened():
       kalman_filter_service,
       last_second,
     )
-    temperatures.append(temperature_filter_state.__dict__)
-    pressures.append(pressure_filter_state.__dict__)
-    humidities.append(humidity_filter_state.__dict__)
+    temperatures.append(temperature_filter_state.__dict__.copy())
+    pressures.append(pressure_filter_state.__dict__.copy())
+    humidities.append(humidity_filter_state.__dict__.copy())
 
   if not ret:
     print("Can't receive frame (stream end?). Exiting ...")
