@@ -6,7 +6,7 @@ def primer_to_dict_mapper(primer: PrimerModel):
         'id': primer.id,
         'name': primer.name,
         'size': primer.size,
-        'manufacturer': primer.manufacturer.__dict__,
+        'manufacturer': primer.manufacturer.__dict__.copy(),
     }
 
     if primer.barcode is not None:

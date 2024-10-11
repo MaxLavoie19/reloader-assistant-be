@@ -5,7 +5,7 @@ def powder_to_dict_mapper(powder: PowderModel):
     powder_dict = {
         'id': powder.id,
         'name': powder.name,
-        'manufacturer': powder.manufacturer.__dict__,
+        'manufacturer': powder.manufacturer.__dict__.copy(),
     }
 
     if powder.barcode is not None:

@@ -6,7 +6,7 @@ def brass_to_dict_mapper(brass: BrassModel):
     brass_dict = {
         'id': brass.id,
         'chambering': chambering_to_dict_mapper(brass.chambering),
-        'manufacturer': brass.manufacturer.__dict__,
+        'manufacturer': brass.manufacturer.__dict__.copy(),
     }
     if brass.barcode is not None:
         brass_dict['barcode'] = brass.barcode

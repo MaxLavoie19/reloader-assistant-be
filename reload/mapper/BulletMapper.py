@@ -4,8 +4,8 @@ from reload.model.BulletModel import BulletModel
 def bullet_to_dict_mapper(bullet: BulletModel):
     bullet_dict = {
         'id': bullet.id,
-        'caliber': bullet.caliber.__dict__,
-        'manufacturer': bullet.manufacturer.__dict__,
+        'caliber': bullet.caliber.__dict__.copy(),
+        'manufacturer': bullet.manufacturer.__dict__.copy(),
         'model': bullet.model,
         'weight_in_grains': bullet.weight_in_grains,
         'g1_ballistic_coefficient': bullet.g1_ballistic_coefficient,
