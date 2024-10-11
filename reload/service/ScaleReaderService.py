@@ -57,6 +57,12 @@ class ScaleReaderService:
         scale_loop_state.min_value <= weight <= scale_loop_state.max_value
       )
 
+    if is_stable and not is_value_valid:
+      if scale_loop_state.min_value > weight:
+        print(f"+{scale_loop_state.min_value - weight}")
+      elif weight > scale_loop_state.max_value:
+        print(f"-{weight - scale_loop_state.max_value}")
+
     is_record_pressed = keyboard.is_pressed('r')
     if is_record_pressed and is_value_valid and scale_loop_state.has_weight_changed_since_record:
       scale_loop_state.has_weight_changed_since_record = False
