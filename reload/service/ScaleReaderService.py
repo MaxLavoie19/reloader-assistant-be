@@ -46,7 +46,7 @@ class ScaleReaderService:
 
     has_weight_changed = scale_loop_state.last_weight != weight
     if is_stable and has_weight_changed:
-      print(weight, unit)
+      print(f"{scale_loop_state.last_weight} {unit} -> {weight} {unit}")
       scale_loop_state.last_weight = weight
       scale_loop_state.has_weight_changed_since_record = True
 
