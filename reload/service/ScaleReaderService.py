@@ -7,13 +7,17 @@ from reload.model.ScaleLoopStateModel import ScaleLoopStateModel
 
 class ScaleReaderService:
   def record_value(self, scale_loop_state: ScaleLoopStateModel, weight):
-    latest_row = scale_loop_state.values_grid[-1]
-    latest_row.append(weight)
-    if len(latest_row) == 10:
+    if len(scale_loop_state.values_grid) == 0:
       scale_loop_state.values_grid.append([])
 
+    latest_row = scale_loop_state.values_grid[-1]
+    if len(latest_row) == 10:
+      scale_loop_state.values_grid.append([])
+      latest_row = scale_loop_state.values_grid[-1]
+
+    latest_row.append(weight)
+
   def record_grid(self, min_value:Union[float, None]=None, max_value:Union[float, None]=None):
-    values_grid = [[]]
     scale_loop_state = ScaleLoopStateModel(min_value=min_value, max_value=max_value)
     with serial.Serial("/dev/ttyUSB0", 1200) as serial_communication:
       serial_communication.write(b"?\r\n")
@@ -25,7 +29,7 @@ class ScaleReaderService:
         scale_loop_state.last_weight = self.process_value(scale_loop_state)
         is_q_pressed = keyboard.is_pressed('q')
 
-    return values_grid
+    return scale_loop_state.values_grid
 
   def read_value(self, serial_communication: serial.Serial):
     reading = serial_communication.readline().decode()
