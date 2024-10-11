@@ -1,6 +1,8 @@
 import serial
 
-with serial.Serial("com1") as serial_communication:
+with serial.Serial("/dev/ttyUSB0", 1200) as serial_communication:
   serial_communication.write(b"?\r\n")
   while True:
-    print(serial_communication.readline())
+    reading = serial_communication.readline().decode()
+    reading_segments = reading.strip().split(' ')
+    print(reading_segments)
