@@ -25,8 +25,7 @@ class ScaleReaderService:
       is_q_pressed = False
       while not is_q_pressed:
         scale_loop_state.reading_segments = self.read_value(serial_communication)
-
-        scale_loop_state.last_weight = self.process_value(scale_loop_state)
+        self.process_value(scale_loop_state)
         is_q_pressed = keyboard.is_pressed('q')
 
     return scale_loop_state.values_grid
