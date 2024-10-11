@@ -6,6 +6,9 @@ with serial.Serial("/dev/ttyUSB0", 1200) as serial_communication:
   while True:
     reading = serial_communication.readline().decode()
     reading_segments = list(filter(None, reading.strip().split(' ')))
+    if len(reading_segments) != 4:
+      continue
+
     _, info, weight_string, unit = reading_segments
     weight = float(weight_string)
     is_stable = '*' not in info
