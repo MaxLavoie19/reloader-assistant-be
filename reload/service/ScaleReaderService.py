@@ -1,6 +1,5 @@
-from typing import List, Union
 import serial
-import keyboard
+import pyinputplus
 
 from reload.model.ScaleLoopStateModel import ScaleLoopStateModel
 
@@ -14,19 +13,39 @@ class ScaleReaderService:
     if len(latest_row) == 10:
       scale_loop_state.values_grid.append([])
       latest_row = scale_loop_state.values_grid[-1]
+    print(f"Recorded:\n{scale_loop_state.last_weight} {scale_loop_state.unit}")
 
-    latest_row.append(weight)
+    if scale_loop_state.record_length:
+      length_mm = pyinputplus.inputFloat("Length (mm):")
+      latest_row.append((weight, length_mm))
+      print(f"{length_mm} mm\n")
+    else:
+      latest_row.append(weight)
+      print()
+    scale_loop_state.has_weight_changed_since_record = False
 
-  def record_grid(self, min_value:Union[float, None]=None, max_value:Union[float, None]=None):
-    scale_loop_state = ScaleLoopStateModel(min_value=min_value, max_value=max_value)
+  def record_grid(self, scale_loop_state: ScaleLoopStateModel):
+    can_record = False
     with serial.Serial("/dev/ttyUSB0", 1200) as serial_communication:
       serial_communication.write(b"?\r\n")
       scale_loop_state.last_weight = 0
-      is_q_pressed = False
-      while not is_q_pressed:
+      user_input = ''
+      while user_input != 'q':
         scale_loop_state.reading_segments = self.read_value(serial_communication)
+        if len(scale_loop_state.reading_segments) != 4:
+          continue
+
         self.process_value(scale_loop_state)
-        is_q_pressed = keyboard.is_pressed('q')
+        prompt = "q: Quit\n"
+        last_weight = scale_loop_state.last_weight
+        is_value_valid = self.is_value_valid(scale_loop_state, last_weight)
+        can_record = scale_loop_state.has_weight_changed_since_record and is_value_valid
+        if can_record:
+          prompt = f"r: Record value {last_weight} {scale_loop_state.unit}\n{prompt}"
+
+        user_input = pyinputplus.inputStr(prompt=prompt, timeout=2)
+        if user_input == 'r' and can_record:
+          self.record_value(scale_loop_state, last_weight)
 
     return scale_loop_state.values_grid
 
@@ -36,35 +55,33 @@ class ScaleReaderService:
     return reading_segments
 
   def process_value(self, scale_loop_state: ScaleLoopStateModel):
-    if len(scale_loop_state.reading_segments) != 4:
-      return
-
     _, info, weight_string, unit = scale_loop_state.reading_segments
     weight = float(weight_string)
     is_stable = '*' not in info
+    scale_loop_state.unit = unit
 
     has_weight_changed = scale_loop_state.last_weight != weight
     if is_stable and has_weight_changed:
-      print(f"Press 'r' to record the value: {weight} {unit}")
       scale_loop_state.last_weight = weight
       scale_loop_state.has_weight_changed_since_record = True
 
-    is_value_valid = (
-        scale_loop_state.min_value is None
-      ) or (
-        scale_loop_state.max_value is None
-      ) or (
-        scale_loop_state.min_value <= weight <= scale_loop_state.max_value
-      )
-
+    is_value_valid = self.is_value_valid(scale_loop_state, weight)
     if is_stable and not is_value_valid:
-      if scale_loop_state.min_value > weight:
-        print(f"+{scale_loop_state.min_value - weight}")
-      elif weight > scale_loop_state.max_value:
-        print(f"-{weight - scale_loop_state.max_value}")
+      self.print_correction(scale_loop_state, weight)
 
-    is_record_pressed = keyboard.is_pressed('r')
-    if is_record_pressed and is_value_valid and scale_loop_state.has_weight_changed_since_record:
-      scale_loop_state.has_weight_changed_since_record = False
-      self.record_value(scale_loop_state, weight)
-      print(f"Recorded: {weight} {unit}")
+  def print_correction(self, scale_loop_state: ScaleLoopStateModel, weight: float):
+    if scale_loop_state.min_value > weight:
+      print(f"+{scale_loop_state.min_value - weight}")
+    elif weight > scale_loop_state.max_value:
+      print(f"-{weight - scale_loop_state.max_value}")
+
+  def is_value_valid(self, scale_loop_state: ScaleLoopStateModel, value: float):
+    has_min = scale_loop_state.min_value is not None
+    has_max = scale_loop_state.max_value is not None
+    if has_min and has_max:
+      is_value_valid = scale_loop_state.min_value <= value <= scale_loop_state.max_value
+    else:
+      is_value_valid = True
+
+    return is_value_valid
+
