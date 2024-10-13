@@ -65,6 +65,7 @@ class ScaleReaderService:
     _, info, weight_string, unit = scale_loop_state.reading_segments
     weight = float(weight_string)
     is_stable = self.is_stable(info, weight)
+    print(f"is_stable {is_stable}, '*' not in {info} or {weight} <= 1.0")
     scale_loop_state.unit = unit
 
     has_weight_changed = self.has_weight_changed(scale_loop_state, weight)
