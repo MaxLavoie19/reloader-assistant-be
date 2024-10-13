@@ -1,3 +1,4 @@
+from datetime import datetime
 import serial
 import pyinputplus
 from inputimeout import inputimeout, TimeoutOccurred
@@ -55,12 +56,22 @@ class ScaleReaderService:
 
   def read_value(self, serial_communication: serial.Serial):
     try:
-      serial_communication.readlines()  # read all lines since last reading then wait for next reading
-      reading = serial_communication.readline().decode("ascii")
+      reading = self.read_latest_line(serial_communication)
       reading_segments = list(filter(None, reading.strip().split(' ')))
     except:
       return []
     return reading_segments
+
+  def read_latest_line(self, serial_communication: serial.Serial):
+    delay = 0
+    latest_line = ""
+    while delay < 0.1:
+      start = datetime.now()
+      latest_line = serial_communication.readline()
+      end = datetime.now()
+      delay = (end - start).total_seconds()
+      print(f"delay: {delay}")
+    return latest_line.decode("ascii")
 
   def process_value(self, scale_loop_state: ScaleLoopStateModel):
     _, info, weight_string, unit = scale_loop_state.reading_segments
