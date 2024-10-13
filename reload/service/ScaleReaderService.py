@@ -41,8 +41,6 @@ class ScaleReaderService:
         last_weight = scale_loop_state.last_weight
         is_value_valid = self.is_value_valid(scale_loop_state, last_weight)
         can_record = scale_loop_state.has_weight_changed_since_record and is_value_valid
-        print(f"has_weight_changed_since_record: {scale_loop_state.has_weight_changed_since_record} and is_value_valid: {is_value_valid}")
-        print(f"last_weight: {last_weight}")
         if can_record:
           prompt = f"r: Record value {last_weight} {scale_loop_state.unit}\n{prompt}"
 
@@ -66,7 +64,7 @@ class ScaleReaderService:
   def process_value(self, scale_loop_state: ScaleLoopStateModel):
     _, info, weight_string, unit = scale_loop_state.reading_segments
     weight = float(weight_string)
-    is_stable = '*' not in info
+    is_stable = self.is_stable(info, weight)
     scale_loop_state.unit = unit
 
     has_weight_changed = self.has_weight_changed(scale_loop_state, weight)
@@ -78,8 +76,11 @@ class ScaleReaderService:
     if is_stable and not is_value_valid:
       self.print_correction(scale_loop_state, weight)
 
+  def is_stable(self, info, weight):
+    return '*' not in info or weight <= 1.0
+
   def has_weight_changed(self, scale_loop_state: ScaleLoopStateModel, weight: float):
-    has_weight_changed = scale_loop_state.last_weight != weight or weight <= 1.0
+    has_weight_changed = scale_loop_state.last_weight != weight
     return has_weight_changed
 
   def print_correction(self, scale_loop_state: ScaleLoopStateModel, weight: float):
