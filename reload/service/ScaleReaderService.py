@@ -47,16 +47,14 @@ class ScaleReaderService:
           continue
 
         prompt = "q: Quit\n"
-        timeout = 1
         last_weight = scale_loop_state.last_weight
         is_value_valid = self.is_value_valid(scale_loop_state, last_weight)
         can_record = scale_loop_state.has_weight_changed_since_record and is_value_valid
         if can_record:
           prompt = f"r: Record value {last_weight} {scale_loop_state.unit}\n{prompt}"
-          timeout = 2
 
         try:
-            user_input = inputimeout(prompt=prompt, timeout=timeout)
+            user_input = inputimeout(prompt=prompt, timeout=5)
         except TimeoutOccurred:
             user_input = ''
         if user_input == 'r' and can_record:
