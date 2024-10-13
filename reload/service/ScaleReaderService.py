@@ -1,5 +1,6 @@
 import serial
 import pyinputplus
+from inputimeout import inputimeout, TimeoutOccurred
 
 from reload.model.ScaleLoopStateModel import ScaleLoopStateModel
 
@@ -43,15 +44,21 @@ class ScaleReaderService:
         if can_record:
           prompt = f"r: Record value {last_weight} {scale_loop_state.unit}\n{prompt}"
 
-        user_input = pyinputplus.inputStr(prompt=prompt, timeout=2)
+        try:
+            user_input = inputimeout(prompt=prompt, timeout=2)
+        except TimeoutOccurred:
+            user_input = ''
         if user_input == 'r' and can_record:
           self.record_value(scale_loop_state, last_weight)
 
     return scale_loop_state.values_grid
 
   def read_value(self, serial_communication: serial.Serial):
-    reading = serial_communication.readline().decode()
-    reading_segments = list(filter(None, reading.strip().split(' ')))
+    try:
+      reading = serial_communication.readline().decode("ascii")
+      reading_segments = list(filter(None, reading.strip().split(' ')))
+    except:
+      return []
     return reading_segments
 
   def process_value(self, scale_loop_state: ScaleLoopStateModel):
