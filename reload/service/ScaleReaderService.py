@@ -13,7 +13,7 @@ class ScaleReaderService:
   def record_value(self, scale_loop_state: ScaleLoopStateModel, weight):
     nb_values = len(scale_loop_state.values)
     coordinates = self.get_coordinates(nb_values)
-    print(f"Recorded:\n{scale_loop_state.last_weight} {scale_loop_state.unit} @ {coordinates}")
+    print(f"Recorded @ {coordinates}:\n{scale_loop_state.last_weight} {scale_loop_state.unit}")
 
     if scale_loop_state.record_length:
       length_mm = pyinputplus.inputFloat("Length (mm):")
