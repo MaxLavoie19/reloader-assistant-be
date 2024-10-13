@@ -4,6 +4,7 @@ from typing import List, Union
 @dataclass
 class ScaleLoopStateModel:
   has_weight_changed_since_record: bool = True
+  is_stable: bool = False
   unit: str = "Gn"
   reading_segments: List[str] = field(default_factory=list)
   values_grid: List[List[float]] = field(default_factory=list)

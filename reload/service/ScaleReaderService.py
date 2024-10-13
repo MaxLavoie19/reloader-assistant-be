@@ -38,6 +38,9 @@ class ScaleReaderService:
           continue
 
         self.process_value(scale_loop_state)
+        if not scale_loop_state.is_stable:
+          continue
+
         prompt = "q: Quit\n"
         last_weight = scale_loop_state.last_weight
         is_value_valid = self.is_value_valid(scale_loop_state, last_weight)
@@ -75,16 +78,19 @@ class ScaleReaderService:
   def process_value(self, scale_loop_state: ScaleLoopStateModel):
     _, info, weight_string, unit = scale_loop_state.reading_segments
     weight = float(weight_string)
-    is_stable = self.is_stable(info, weight)
+    scale_loop_state.is_stable = self.is_stable(info, weight)
+    if not scale_loop_state.is_stable:
+      return
+
     scale_loop_state.unit = unit
 
     has_weight_changed = self.has_weight_changed(scale_loop_state, weight)
-    if is_stable and has_weight_changed:
+    if has_weight_changed:
       scale_loop_state.last_weight = weight
       scale_loop_state.has_weight_changed_since_record = True
 
     is_value_valid = self.is_value_valid(scale_loop_state, weight)
-    if is_stable and not is_value_valid:
+    if not is_value_valid:
       self.print_correction(scale_loop_state, weight)
 
   def is_stable(self, info, weight):
