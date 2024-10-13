@@ -12,7 +12,7 @@ ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 class ScaleReaderService:
   def record_value(self, scale_loop_state: ScaleLoopStateModel, weight):
     nb_values = len(scale_loop_state.values)
-    coordinates = self.get_coordinates(nb_values + 1)
+    coordinates = self.get_coordinates(nb_values)
     print(f"Recorded:\n{scale_loop_state.last_weight} {scale_loop_state.unit} @ {coordinates}")
 
     if scale_loop_state.record_length:
@@ -27,7 +27,7 @@ class ScaleReaderService:
   def get_coordinates(self, index: int):
     letter_index = int((index % 100) / 10)
     letter = ALPHABET[letter_index]
-    digit = int(index % 10)
+    digit = int((index + 1) % 10)
     coordinates = f"{letter}{digit}"
     return coordinates
 
