@@ -55,6 +55,7 @@ class ScaleReaderService:
 
   def read_value(self, serial_communication: serial.Serial):
     try:
+      serial_communication.readlines()  # read all lines since last reading then wait for next reading
       reading = serial_communication.readline().decode("ascii")
       reading_segments = list(filter(None, reading.strip().split(' ')))
     except:
