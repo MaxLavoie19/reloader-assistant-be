@@ -107,10 +107,18 @@ class ScaleReaderService:
     return has_weight_changed
 
   def print_correction(self, scale_loop_state: ScaleLoopStateModel, weight: float):
-    if scale_loop_state.min_value > weight:
-      print(f"+{scale_loop_state.min_value - weight}")
-    elif weight > scale_loop_state.max_value:
-      print(f"-{weight - scale_loop_state.max_value}")
+    min_value = scale_loop_state.min_value
+    max_value = scale_loop_state.max_value
+    has_min = min_value is not None
+    has_max = max_value is not None
+
+    if not has_min or not has_max or weight <= 1:
+      return
+
+    if min_value > weight:
+      print(f"+{min_value - weight}")
+    elif weight > max_value:
+      print(f"-{weight - max_value}")
 
   def is_value_valid(self, scale_loop_state: ScaleLoopStateModel, value: float):
     min_value = scale_loop_state.min_value
