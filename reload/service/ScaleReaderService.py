@@ -6,25 +6,29 @@ from inputimeout import inputimeout, TimeoutOccurred
 from reload.model.ScaleLoopStateModel import ScaleLoopStateModel
 
 
+ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+
 class ScaleReaderService:
   def record_value(self, scale_loop_state: ScaleLoopStateModel, weight):
-    if len(scale_loop_state.values_grid) == 0:
-      scale_loop_state.values_grid.append([])
-
-    latest_row = scale_loop_state.values_grid[-1]
-    if len(latest_row) == 10:
-      scale_loop_state.values_grid.append([])
-      latest_row = scale_loop_state.values_grid[-1]
-    print(f"Recorded:\n{scale_loop_state.last_weight} {scale_loop_state.unit}")
+    coordinates = self.get_coordinates(len(scale_loop_state.values) + 1)
+    print(f"Recorded:\n{scale_loop_state.last_weight} {scale_loop_state.unit} @ {coordinates}")
 
     if scale_loop_state.record_length:
       length_mm = pyinputplus.inputFloat("Length (mm):")
-      latest_row.append((weight, length_mm))
+      scale_loop_state.values.append((weight, length_mm))
       print(f"{length_mm} mm\n")
     else:
-      latest_row.append(weight)
+      scale_loop_state.values.append(weight)
       print()
     scale_loop_state.has_weight_changed_since_record = False
+
+  def get_coordinates(self, index: int):
+    letter_index = (index % 100) / 10
+    letter = ALPHABET[letter_index]
+    digit = index % 10
+    coordinates = f"{letter}{digit}"
+    return coordinates
 
   def record_grid(self, scale_loop_state: ScaleLoopStateModel):
     can_record = False
