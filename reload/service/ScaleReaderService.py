@@ -11,7 +11,8 @@ ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 class ScaleReaderService:
   def record_value(self, scale_loop_state: ScaleLoopStateModel, weight):
-    coordinates = self.get_coordinates(len(scale_loop_state.values) + 1)
+    nb_values = len(scale_loop_state.values)
+    coordinates = self.get_coordinates(nb_values + 1)
     print(f"Recorded:\n{scale_loop_state.last_weight} {scale_loop_state.unit} @ {coordinates}")
 
     if scale_loop_state.record_length:
