@@ -24,9 +24,9 @@ class ScaleReaderService:
     scale_loop_state.has_weight_changed_since_record = False
 
   def get_coordinates(self, index: int):
-    letter_index = (index % 100) / 10
+    letter_index = int((index % 100) / 10)
     letter = ALPHABET[letter_index]
-    digit = index % 10
+    digit = int(index % 10)
     coordinates = f"{letter}{digit}"
     return coordinates
 
