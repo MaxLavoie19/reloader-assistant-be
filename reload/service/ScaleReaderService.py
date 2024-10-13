@@ -41,6 +41,7 @@ class ScaleReaderService:
         last_weight = scale_loop_state.last_weight
         is_value_valid = self.is_value_valid(scale_loop_state, last_weight)
         can_record = scale_loop_state.has_weight_changed_since_record and is_value_valid
+        print(f"has_weight_changed_since_record: {has_weight_changed_since_record} and is_value_valid: {is_value_valid}")
         if can_record:
           prompt = f"r: Record value {last_weight} {scale_loop_state.unit}\n{prompt}"
 
