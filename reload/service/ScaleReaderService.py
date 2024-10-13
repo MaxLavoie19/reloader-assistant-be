@@ -45,7 +45,7 @@ class ScaleReaderService:
           prompt = f"r: Record value {last_weight} {scale_loop_state.unit}\n{prompt}"
 
         try:
-            user_input = inputimeout(prompt=prompt, timeout=2)
+            user_input = inputimeout(prompt=prompt, timeout=3)
         except TimeoutOccurred:
             user_input = ''
         if user_input == 'r' and can_record:
@@ -67,7 +67,7 @@ class ScaleReaderService:
     is_stable = '*' not in info
     scale_loop_state.unit = unit
 
-    has_weight_changed = scale_loop_state.last_weight != weight
+    has_weight_changed = self.has_weight_changed(scale_loop_state, weight)
     if is_stable and has_weight_changed:
       scale_loop_state.last_weight = weight
       scale_loop_state.has_weight_changed_since_record = True
@@ -76,6 +76,10 @@ class ScaleReaderService:
     if is_stable and not is_value_valid:
       self.print_correction(scale_loop_state, weight)
 
+  def has_weight_changed(self, scale_loop_state: ScaleLoopStateModel, weight: float):
+    has_weight_changed = scale_loop_state.last_weight != weight or weight <= 1.0
+    return has_weight_changed
+
   def print_correction(self, scale_loop_state: ScaleLoopStateModel, weight: float):
     if scale_loop_state.min_value > weight:
       print(f"+{scale_loop_state.min_value - weight}")
@@ -83,10 +87,12 @@ class ScaleReaderService:
       print(f"-{weight - scale_loop_state.max_value}")
 
   def is_value_valid(self, scale_loop_state: ScaleLoopStateModel, value: float):
-    has_min = scale_loop_state.min_value is not None
-    has_max = scale_loop_state.max_value is not None
+    min_value = scale_loop_state.min_value
+    max_value = scale_loop_state.max_value
+    has_min = min_value is not None
+    has_max = max_value is not None
     if has_min and has_max:
-      is_value_valid = scale_loop_state.min_value <= value <= scale_loop_state.max_value
+      is_value_valid = min_value <= value <= max_value
     else:
       is_value_valid = True
 
