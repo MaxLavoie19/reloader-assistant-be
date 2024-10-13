@@ -12,6 +12,6 @@ max_value = pyinputplus.inputFloat("Max value")
 scale_loop_state = ScaleLoopStateModel(min_value=min_value, max_value=max_value)
 values_grid = scale_reader.record_grid(scale_loop_state)
 now = datetime.now()
-file_name = f"{now.isoformat()}_{min_value.__str__()}-{max_value.__str__()}_powders.json"
+file_name = f"powders_{min_value.__str__()}-{max_value.__str__()}_{now.isoformat()}.json"
 with open(file_name, 'w') as destination:
   json.dump(values_grid, destination)

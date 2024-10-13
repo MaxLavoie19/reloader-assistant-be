@@ -9,5 +9,5 @@ scale_loop_state = ScaleLoopStateModel()
 values_grid = scale_reader.record_grid(scale_loop_state)
 now = datetime.now()
 
-with open(f"{now.isoformat()}_brasses.json", 'w') as destination:
+with open(f"brasses_{now.isoformat()}.json", 'w') as destination:
   json.dump(values_grid, destination)
