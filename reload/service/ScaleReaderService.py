@@ -20,14 +20,14 @@ class ScaleReaderService:
     coordinates = self.tray_service.get_coordinates(nb_values)
     last_weight = scale_loop_state.last_weight
     unit = scale_loop_state.unit
-    confirmation_message = f"Recorded value #{nb_values + 1} @ {coordinates}:\n{last_weight} {unit}"
+    confirmation_message = f"Recorded value #{nb_values + 1} @ {coordinates}:\n{last_weight} {unit}\n"
 
     if scale_loop_state.record_length:
       offset_mm = pyinputplus.inputFloat(f"Offset from 1 inch ({INCH_IN_MM}mm):\n")
       length_mm = INCH_IN_MM - offset_mm
 
       scale_loop_state.values.append((weight, length_mm))
-      confirmation_message = f"{confirmation_message}{length_mm} mm"
+      confirmation_message = f"{confirmation_message}{length_mm} mm\n"
     else:
       scale_loop_state.values.append(weight)
 
