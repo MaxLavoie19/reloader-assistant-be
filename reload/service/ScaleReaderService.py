@@ -2,6 +2,7 @@ from datetime import datetime
 import serial
 import pyinputplus
 from inputimeout import inputimeout, TimeoutOccurred
+import json
 
 from reload.model.ScaleLoopStateModel import ScaleLoopStateModel
 
@@ -25,6 +26,8 @@ class ScaleReaderService:
       scale_loop_state.values.append(weight)
       print()
     scale_loop_state.has_weight_changed_since_record = False
+    with open(scale_loop_state.destination, 'w') as destination:
+      json.dump(scale_loop_state.values, destination)
 
   def get_coordinates(self, index: int):
     letter_index = int((index % 100) / 10)
@@ -61,8 +64,6 @@ class ScaleReaderService:
             user_input = ''
         if user_input == 'r' and can_record:
           self.record_value(scale_loop_state, last_weight)
-
-    return scale_loop_state.values_grid
 
   def read_value(self, serial_communication: serial.Serial):
     try:

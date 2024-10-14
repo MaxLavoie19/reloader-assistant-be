@@ -12,3 +12,4 @@ class ScaleLoopStateModel:
   min_value: Union[float, None] = None
   max_value: Union[float, None] = None
   record_length: bool = False
+  destination: str
