@@ -6,7 +6,7 @@ from reload.service.TrayService import TrayService
 
 tray_service = TrayService()
 scale_reader = ScaleReaderService(tray_service)
-now = datetime.now()
-destination = f"brasses_{now.isoformat()}.json"
+now = datetime.now().isoformat().replace(":", "_")
+destination = f"brasses_{now}.json"
 scale_loop_state = ScaleLoopStateModel(destination=destination)
 values = scale_reader.record_grid(scale_loop_state)

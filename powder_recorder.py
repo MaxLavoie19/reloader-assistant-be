@@ -10,8 +10,8 @@ scale_reader = ScaleReaderService(tray_service)
 
 min_value = pyinputplus.inputFloat("Min value")
 max_value = pyinputplus.inputFloat("Max value")
-now = datetime.now()
-destination = f"powders_{min_value.__str__()}-{max_value.__str__()}_{now.isoformat()}.json"
+now = datetime.now().isoformat().replace(":", "_")
+destination = f"powders_{min_value.__str__()}-{max_value.__str__()}_{now}.json"
 scale_loop_state = ScaleLoopStateModel(
   destination=destination, min_value=min_value, max_value=max_value
 )
