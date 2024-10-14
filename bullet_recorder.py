@@ -6,5 +6,5 @@ from reload.service.ScaleReaderService import ScaleReaderService
 scale_reader = ScaleReaderService()
 now = datetime.now()
 destination = f"bullets_{now.isoformat()}.json"
-scale_loop_state = ScaleLoopStateModel(record_length=True, destination=destination)
+scale_loop_state = ScaleLoopStateModel(destination=destination, record_length=True)
 values = scale_reader.record_grid(scale_loop_state)
