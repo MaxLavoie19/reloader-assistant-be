@@ -8,6 +8,9 @@ from reload.model.ScaleLoopStateModel import ScaleLoopStateModel
 from reload.service.TrayService import TrayService
 
 
+INCH_IN_MM = 25.4
+
+
 class ScaleReaderService:
   def __init__(self, tray_service: TrayService):
     self.tray_service = tray_service
@@ -17,15 +20,18 @@ class ScaleReaderService:
     coordinates = self.tray_service.get_coordinates(nb_values)
     last_weight = scale_loop_state.last_weight
     unit = scale_loop_state.unit
-    print(f"Recorded value #{nb_values + 1} @ {coordinates}:\n{last_weight} {unit}")
+    confirmation_message = f"Recorded value #{nb_values + 1} @ {coordinates}:\n{last_weight} {unit}"
 
     if scale_loop_state.record_length:
-      length_mm = pyinputplus.inputFloat("Length (mm):")
+      offset_mm = pyinputplus.inputFloat(f"Offset from 1 inch ({INCH_IN_MM}mm):\n")
+      length_mm = INCH_IN_MM - offset_mm
+
       scale_loop_state.values.append((weight, length_mm))
-      print(f"{length_mm} mm\n")
+      confirmation_message = f"{confirmation_message}{length_mm} mm"
     else:
       scale_loop_state.values.append(weight)
-      print()
+
+    print(confirmation_message)
     scale_loop_state.has_weight_changed_since_record = False
     with open(scale_loop_state.destination, 'w') as destination:
       json.dump(scale_loop_state.values, destination)

@@ -32,7 +32,7 @@ for index_weight in enumerate(brasses):
   cluster.append(index_weight)
 
 cases = []
-case_index = 0
+case_index = 1
 for cluster_label, cluster in cluster_dict.items():
   min_value = min(map(lambda x: x[1], cluster))
   max_value = max(map(lambda x: x[1], cluster))
@@ -41,7 +41,7 @@ for cluster_label, cluster in cluster_dict.items():
   print(", ".join(cluster_coordinates))
   sorted_cluster = sorted(cluster, key=lambda x: x[1])
   case = []
-  cluster_case_index = 0
+  cluster_case_index = 1
   for index_weight in sorted_cluster:
     case.append(index_weight)
     if len(case) == 8:
