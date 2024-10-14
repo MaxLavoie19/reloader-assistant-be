@@ -5,15 +5,16 @@ from inputimeout import inputimeout, TimeoutOccurred
 import json
 
 from reload.model.ScaleLoopStateModel import ScaleLoopStateModel
-
-
-ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+from reload.service.TrayService import TrayService
 
 
 class ScaleReaderService:
+  def __init__(self, tray_service: TrayService):
+    self.tray_service = tray_service
+
   def record_value(self, scale_loop_state: ScaleLoopStateModel, weight):
     nb_values = len(scale_loop_state.values)
-    coordinates = self.get_coordinates(nb_values)
+    coordinates = self.tray_service.get_coordinates(nb_values)
     last_weight = scale_loop_state.last_weight
     unit = scale_loop_state.unit
     print(f"Recorded value #{nb_values + 1} @ {coordinates}:\n{last_weight} {unit}")
@@ -28,13 +29,6 @@ class ScaleReaderService:
     scale_loop_state.has_weight_changed_since_record = False
     with open(scale_loop_state.destination, 'w') as destination:
       json.dump(scale_loop_state.values, destination)
-
-  def get_coordinates(self, index: int):
-    letter_index = int((index % 100) / 10)
-    letter = ALPHABET[letter_index]
-    digit = int((index + 1) % 10)
-    coordinates = f"{letter}{digit}"
-    return coordinates
 
   def record_grid(self, scale_loop_state: ScaleLoopStateModel):
     can_record = False

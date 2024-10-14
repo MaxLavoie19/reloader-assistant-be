@@ -3,8 +3,10 @@ import pyinputplus
 
 from reload.model.ScaleLoopStateModel import ScaleLoopStateModel
 from reload.service.ScaleReaderService import ScaleReaderService
+from reload.service.TrayService import TrayService
 
-scale_reader = ScaleReaderService()
+tray_service = TrayService()
+scale_reader = ScaleReaderService(tray_service)
 
 min_value = pyinputplus.inputFloat("Min value")
 max_value = pyinputplus.inputFloat("Max value")

@@ -2,8 +2,10 @@ from datetime import datetime
 
 from reload.model.ScaleLoopStateModel import ScaleLoopStateModel
 from reload.service.ScaleReaderService import ScaleReaderService
+from reload.service.TrayService import TrayService
 
-scale_reader = ScaleReaderService()
+tray_service = TrayService()
+scale_reader = ScaleReaderService(tray_service)
 now = datetime.now()
 destination = f"bullets_{now.isoformat()}.json"
 scale_loop_state = ScaleLoopStateModel(destination=destination, record_length=True)
