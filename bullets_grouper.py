@@ -11,17 +11,19 @@ from server_io.service.FileService import FileService
 tray_service = TrayService()
 file_service = FileService()
 
-desired_file = file_service.select_file("./", "brasses_", "json")
+desired_file = file_service.select_file("./", "bullets_", "json")
 
-with open(desired_file) as brasses_file:
-  brasses = json.load(brasses_file)
+with open(desired_file) as bullets_file:
+  bullets = json.load(bullets_file)
 
-clust = OPTICS(min_samples=8, min_cluster_size=8, max_eps=.75, cluster_method="dbscan")
-clust.fit(np.array(brasses).reshape(-1, 1))
+bullets_lengths = list(map(lambda x: x[1], bullets))
+
+clust = OPTICS(min_samples=8, min_cluster_size=8, max_eps=.01, cluster_method="dbscan")
+clust.fit(np.array(bullets_lengths).reshape(-1, 1))
 
 cluster_dict: Dict[int, List[Tuple[int, float]]] = {}
-for index_weight in enumerate(brasses):
-  index, brass_weight = index_weight
+for index_weight in enumerate(bullets_lengths):
+  index, bullet_weight = index_weight
   cluster_label = clust.labels_[index]
   if cluster_label == -1:
     continue
@@ -50,7 +52,7 @@ for cluster_label, cluster in sorted_clusters:
       coordinates = sorted(map(lambda x: tray_service.get_coordinates(x[0]), case))
       coordinates_string = ", ".join(coordinates)
       case_range = round(weights[-1]-weights[0], 2)
-      case_info = f"#{case_index} {weights[0]}-{weights[-1]} {case_range}"
+      case_info = f"#{case_index} {weights[0]:0.3f}-{weights[-1]:0.3f} {case_range}"
       print(f"    Case {case_info}:\t{coordinates_string}")
       if cluster_case_index % 4 == 0 and cluster_case_index > 0:
         print()
