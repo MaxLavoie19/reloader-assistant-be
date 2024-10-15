@@ -8,8 +8,8 @@ from reload.service.TrayService import TrayService
 tray_service = TrayService()
 scale_reader = ScaleReaderService(tray_service)
 
-min_value = pyinputplus.inputFloat("Min value")
-max_value = pyinputplus.inputFloat("Max value")
+min_value = pyinputplus.inputFloat("Min value (gn): ")
+max_value = pyinputplus.inputFloat("Max value (gn): ")
 now = datetime.now().isoformat().replace(":", "_")
 destination = f"powders_{min_value.__str__()}-{max_value.__str__()}_{now}.json"
 scale_loop_state = ScaleLoopStateModel(
