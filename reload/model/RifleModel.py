@@ -5,7 +5,7 @@ from reload.model import ShooterModel
 
 
 @dataclass
-class Rifle:
+class RifleModel:
     chambering: ChamberingModel
     barrel_length_inches: float
     twist_rate: str
