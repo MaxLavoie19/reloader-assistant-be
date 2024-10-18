@@ -5,6 +5,7 @@ from ballistic.data.DragModels import DragModels
 from ballistic.model.ShotModel import ShotModel
 from ballistic.model.BulletDragModel import BulletDragModel
 from ballistic.model.WeatherConditionModel import WeatherConditionModel
+from ballistic.service.InterpolationService import InterpolationService
 
 DRAG_MODEL_FILE_NAMES = {
    DragModels.G1: "mcg1.txt",
@@ -13,6 +14,9 @@ DRAG_MODEL_FILE_NAMES = {
 
 
 class DragCalculatorService:
+  def __init__(self, interpolation_service: InterpolationService):
+    self.interpolation_service = interpolation_service
+
   def bullet_drag_model_factory(
     self,
     drag_model_name: DragModels,
@@ -86,7 +90,7 @@ class DragCalculatorService:
       shot.bullet_drag.model_mach_numbers, shot.bullet_drag.bullet_drag_coefficients
     ):
       if next_mach_number > mach_number:
-        drag = self.linear_interpolation(
+        drag = self.interpolation_service.linear_interpolation(
           previous_mach_number,
           previous_drag_coefficient,
           next_mach_number,
@@ -148,11 +152,3 @@ class DragCalculatorService:
     velocity_squared = pow(flow_velocity_meter_per_seconds, 2)
     drag_force = fluid_mass_density_kg_per_m3 * velocity_squared * drag_coefficient * area_m2 / 2
     return drag_force
-
-  def linear_interpolation(self, x1: float, y1: float, x2: float, y2: float, x: float):
-      diff_x = x2 - x1
-      diff_y = y2 - y1
-      desired_x_diff = x - x1
-      x_ratio = desired_x_diff / diff_x
-      y = y1 + (diff_y * x_ratio)
-      return y

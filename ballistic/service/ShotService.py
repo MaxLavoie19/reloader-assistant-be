@@ -5,13 +5,53 @@ from ballistic.model.BulletDragModel import BulletDragModel
 from ballistic.model.RifleModel import RifleModel
 from ballistic.model.WeatherConditionModel import WeatherConditionModel
 from ballistic.service.DragCalculatorService import DragCalculatorService
+from ballistic.service.InterpolationService import InterpolationService
 
 
 GRAVITY_M_S2 = 9.807
 
 class ShotService:
-  def __init__(self, drag_calculator_service: DragCalculatorService):
+  def __init__(
+    self,
+    drag_calculator_service: DragCalculatorService,
+    interpolation_service: InterpolationService,
+  ):
     self.drag_calculator_service = drag_calculator_service
+    self.interpolation_service = interpolation_service
+
+  def height_m_at_distance_m(self, shot: ShotModel, distance_m: float):
+    trajectory = shot.trajectory
+    previous_height_m = trajectory.ym_positions[0]
+    previous_distance_m = trajectory.xm_positions[0]
+    for next_height_m, next_distance_m in zip(
+      trajectory.ym_positions[1:], trajectory.xm_positions[1:]
+    ):
+      if next_distance_m == distance_m:
+        return next_height_m
+      elif next_distance_m > distance_m:
+        height_m_at_distance_m = self.interpolation_service.linear_interpolation(
+          previous_distance_m, previous_height_m, next_distance_m, next_height_m, distance_m
+        )
+        return height_m_at_distance_m
+      previous_distance_m = next_distance_m
+      previous_height_m = next_height_m
+
+  def velocity_m_per_s_at_distance_m(self, shot: ShotModel, distance_m: float):
+    trajectory = shot.trajectory
+    previous_velocity_m = trajectory.v_m_per_s_positions[0]
+    previous_distance_m = trajectory.xm_positions[0]
+    for next_velocity_m, next_distance_m in zip(
+      trajectory.v_m_per_s_positions[1:], trajectory.xm_positions[1:]
+    ):
+      if next_distance_m == distance_m:
+        return next_velocity_m
+      elif next_distance_m > distance_m:
+        height_m_at_distance_m = self.interpolation_service.linear_interpolation(
+          previous_distance_m, previous_velocity_m, next_distance_m, next_velocity_m, distance_m
+        )
+        return height_m_at_distance_m
+      previous_distance_m = next_distance_m
+      previous_velocity_m = next_velocity_m
 
   def shoot_to_distance(
     self,
