@@ -39,3 +39,11 @@ class FileService:
 
     desired_file = pyinputplus.inputMenu(options, numbered=True)
     return join(folder_path, desired_file)
+
+  def open_component_file(self, prefix: str):
+    desired_file = self.select_file("./", prefix, "json")
+
+    with open(desired_file) as components_file:
+      components = json.load(components_file)
+
+    return components

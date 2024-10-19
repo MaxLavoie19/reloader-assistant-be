@@ -55,15 +55,15 @@ print_stats(brasses)
 
 clusters = []
 max_label = max(clust.labels_)
-for cluster_index in range(-1, max_label + 1):
+for cluster_label in range(-1, max_label + 1):
   clusters.append(
     list(sorted(
-      map(lambda x: x[1], filter(lambda x: clust.labels_[x[0]] == cluster_index, enumerate(brasses)))
+      map(lambda x: x[1], filter(lambda x: clust.labels_[x[0]] == cluster_label, enumerate(brasses)))
     ))
   )
   if len(clusters[-1]) <= 1:
     continue
-  print(f"\n{cluster_index}")
+  print(f"\n{cluster_label}")
   print_stats(clusters[-1])
   print(clusters[-1])
   sub_clusters = split_cluster(clusters[-1])

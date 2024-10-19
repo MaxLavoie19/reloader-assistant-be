@@ -16,7 +16,7 @@ BULLET_G7_BC = BERGER_6_5_140_GN_HYBRID_TARGET_G7
 
 YARDS_100_IN_M = 91.44
 ZERO_DISTANCE = YARDS_100_IN_M
-MUZZLE_VELOCITY_FPS = 2316
+MUZZLE_VELOCITY_FPS = 1100
 FRAME_PER_SECONDS = 10000.0
 SCOPE_HEIGHT_M = 43.5 / 1000
 MUZZLE_DISTANCE_M = .8
@@ -78,7 +78,8 @@ rifle = RifleModel(
 if not SKIP_ZERO:
   zero_at_100y_angle = get_adjustment(ZERO_DISTANCE, FRAME_PER_SECONDS, zero_at_100y_angle)
 
-angle_1000 = get_adjustment(1000, FRAME_PER_SECONDS, zero_at_100y_angle)
+angle_1000 = get_adjustment(400, FRAME_PER_SECONDS, zero_at_100y_angle)
+print(angle_1000)
 
 shot = shot_service.shot_factory(angle_1000, weather_condition, bullet_drag, rifle)
 shot_service.shoot_to_distance(shot, 1010, FRAME_PER_SECONDS)
