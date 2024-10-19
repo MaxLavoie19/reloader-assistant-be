@@ -18,8 +18,10 @@ class TrayService:
     indexes = index_arrays.flatten()
     values = values_arrays.flatten()
     coordinates = list(map(lambda x: self.get_coordinates(x), indexes))
-    max_value = max(values)
     min_value = min(values)
+    max_value = max(values)
     value_std = np.std(values)
 
-    print(f"{prefix}:\t{min_value:0.3f}-{max_value:0.3f} ± {value_std:0.3f}\t:\t{', '.join(coordinates)}")
+    print(
+      f"{prefix}: {min_value:{'>'}{0}0.3f}-{max_value:{' '}{'<'}{1}0.3f}{'±':{' '}{'<'}{0}}{value_std:{'<'}{0}0.3f} : {', '.join(coordinates)}"
+    )
