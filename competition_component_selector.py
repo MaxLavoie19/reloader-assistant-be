@@ -26,6 +26,6 @@ print()
 for i in range(smallest_bin_size):
   print(f"Bin #{i+1}")
   tray_service.print_bin("Brass", brass_bins[i])
-  tray_service.print_bin("Bullet", bullet_bins[i])
   tray_service.print_bin("Powder", powder_bins[i])
+  tray_service.print_bin("Bullet", bullet_bins[i])
   input()
