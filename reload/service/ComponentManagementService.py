@@ -20,7 +20,7 @@ class ComponentManagementService:
     for cluster_label in range(max_label + 1):
       cluster = list(sorted(map(
         lambda x: x, filter(lambda x: clust.labels_[x[0]] == cluster_label, enumerate(components))
-      )))
+      ), key=lambda x: x[1]))
       clusters.append(cluster)
       if len(clusters[-1]) <= 1:
         continue
